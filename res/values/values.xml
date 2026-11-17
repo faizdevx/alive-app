@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#121411</color>
+    <color name="icon_bg">#000000</color>
+    <string name="gpt_desc">Only while you log a meal or workout: types the prompt into the ChatGPT app, presses Send, reads the answer and brings it back to ALIVE?. It only works inside the ChatGPT app and does nothing otherwise.</string>
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+    </style>
+</resources>

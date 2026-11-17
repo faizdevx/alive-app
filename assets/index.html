@@ -1,0 +1,808 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>ALIVE?</title>
+<link rel="stylesheet" href="font.css">
+<style>
+:root{--bg:#0f120f;--panel:#171c16;--panel2:#1f271c;--line:#34422c;--ink:#050705;--acc:#9bd35a;--accd:#5f8f2e;--gold:#f2c14e;--bad:#e2604d;--tx:#e8eddc;--mu:#8a9580;--note:#efd98b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--tx);font:15px/1.45 system-ui,Roboto,sans-serif;padding-bottom:86px}
+h1,h2,h3,button,nav,.px,.num,.big,.lv,.chip,.say{font-family:Pix,monospace}
+h1{font-size:24px;margin:0;font-weight:700;letter-spacing:.5px}h2{font-size:19px;margin:0;font-weight:600}
+h3{font-size:12px;margin:0 0 10px;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.view{display:none;padding:16px 16px 0}.view.on{display:block}
+.panel{background:var(--panel);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--line);padding:14px;margin-bottom:14px}
+.top{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+.muted{color:var(--mu);font-size:13px}.ok{color:var(--acc)}.warn{color:var(--gold)}.neg{color:var(--bad)}
+.row{display:flex;gap:10px}.row>*{flex:1}.sp{justify-content:space-between;align-items:center}.row.sp>*{flex:none}
+button{font-size:15px;font-weight:600;color:var(--tx);background:var(--panel2);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--line),0 3px 0 var(--ink);
+  padding:11px 10px;width:100%;margin:8px 0 10px;display:flex;align-items:center;justify-content:center;gap:8px;text-transform:uppercase;letter-spacing:.5px;border-radius:0}
+button:focus{outline:none}button:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px var(--line)}
+button.pri{background:var(--acc);color:#10200a;box-shadow:inset 0 -3px 0 var(--accd),0 3px 0 var(--ink)}button.pri:active{box-shadow:inset 0 -3px 0 var(--accd)}
+button.on{color:var(--acc);box-shadow:inset 0 0 0 2px var(--acc),0 3px 0 var(--ink)}
+button.sm{width:auto;padding:6px 12px;margin:0}
+button.ghost{background:none;box-shadow:none;border:0;padding:6px;width:auto;margin:0;color:inherit}button.ghost:active{transform:none;opacity:.6}
+input,textarea,select{font:inherit;color:var(--tx);background:#0a0c0a;border:2px solid var(--line);padding:10px;width:100%;margin:4px 0 10px;border-radius:0}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--acc)}
+input[type=checkbox],input[type=range]{accent-color:var(--acc)}input[type=checkbox]{width:24px;height:24px;margin:0}
+textarea{min-height:72px;resize:vertical}label{display:block;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:1px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.bar{height:12px;background:#0a0c0a;border:2px solid var(--ink);margin:5px 0}
+.bar i{display:block;height:100%;background:repeating-linear-gradient(90deg,var(--acc) 0 6px,transparent 6px 8px)}
+.bar.gold i{background:repeating-linear-gradient(90deg,var(--gold) 0 6px,transparent 6px 8px)}
+.bar.bad i{background:repeating-linear-gradient(90deg,var(--bad) 0 6px,transparent 6px 8px)}
+svg.ic{width:20px;height:20px;flex:none;shape-rendering:crispEdges;fill:currentColor}
+.av{display:block;border:2px solid var(--ink);box-shadow:0 0 0 2px var(--line);background:#001a13}
+.avw{flex:none;display:inline-block}
+.hop{animation:hop .5s steps(4)}@keyframes hop{50%{transform:translateY(-16px)}}
+.shake{animation:shake .45s steps(6)}@keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.shadow{height:6px;margin:-4px auto 0;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);}
+.bob{animation:bob 1.4s steps(1) infinite}@keyframes bob{50%{transform:translateY(-4px)}}
+.jump{animation:jump .5s steps(4) 4}@keyframes jump{50%{transform:translateY(-18px)}}
+.face{background:var(--av) center/cover no-repeat;border:2px solid var(--ink);box-shadow:0 0 0 2px var(--line);flex:none}
+.hero{display:flex;gap:18px;align-items:center;margin:4px 0 14px}.hero .info{flex:1;min-width:0;padding-bottom:4px}
+.lv{display:inline-block;background:var(--gold);color:#2a1d00;padding:1px 8px;font-weight:700;font-size:14px;border:2px solid var(--ink)}
+.say{position:relative;background:#0a0c0a;border:2px solid var(--tx);box-shadow:0 0 0 2px var(--ink);padding:12px 14px 16px;margin:0 2px 12px;font-size:16px;line-height:1.35}
+.say:after{content:"";position:absolute;right:10px;bottom:6px;border:6px solid transparent;border-bottom:0;border-top-color:var(--acc);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.stat{display:grid;grid-template-columns:22px 1fr auto;gap:2px 10px;align-items:center;padding:9px 0;border-bottom:2px solid var(--panel2)}
+.stat:last-child{border:0;padding-bottom:0}.stat:first-of-type{padding-top:0}.stat .bar{grid-column:2/4;margin:2px 0 0}
+.num{font-size:17px;font-weight:600}.num small{color:var(--mu);font-size:12px;font-weight:400}
+.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.mini>div{background:var(--panel);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--line);padding:10px}
+.mini b{display:block;font-family:Pix;font-size:24px;margin:2px 0 0;font-weight:600}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.cal i{height:20px;background:#0a0c0a;border:2px solid var(--ink)}
+.cal i.t0{background:#283222}.cal i.t1{background:#456428}.cal i.t2{background:#73a33d}.cal i.t3{background:var(--acc)}.cal i.bad{background:var(--bad)}.cal i.now{border-color:var(--tx)}
+.legend{display:flex;gap:10px;align-items:center;margin-top:8px}.legend i{display:inline-block;width:10px;height:10px;border:2px solid var(--ink);margin-right:4px;vertical-align:-1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{font-size:12px;padding:4px 8px;border:2px solid var(--line);text-transform:uppercase;letter-spacing:.5px}
+.chip.on{border-color:var(--acc);color:var(--acc)}.chip.off{border-color:var(--bad);color:var(--bad)}
+button.tag{width:auto;display:inline-flex;margin:4px 6px 4px 0;padding:6px 10px;font-size:13px}
+.q{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;gap:8px}.q span{display:flex;gap:8px;align-items:center}
+.q svg.ic{width:14px;height:14px}.q.done{color:var(--acc)}.q.neg{color:var(--bad)}.q.todo{color:var(--mu)}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:2px solid var(--panel2)}.item:last-child{border:0}
+.x{color:var(--bad)}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#0a0c0a;border-top:2px solid var(--line);padding:4px 8px 8px;z-index:5}
+nav button{flex:1;flex-direction:column;gap:2px;background:none;border:0;box-shadow:none;margin:0;padding:6px 0 2px;font-size:11px;color:var(--mu);letter-spacing:1px}
+nav button:active{transform:none}nav button.on{color:var(--acc);box-shadow:none}nav button.on svg{filter:drop-shadow(0 2px 0 var(--accd))}
+.big{font-size:34px;font-weight:600}.big,.num,.lv,.ring,.mini b{text-shadow:1px 0 0 currentColor}.ctr{text-align:center}
+.note{background:var(--note);color:#3a2c0b;border:2px solid var(--ink);box-shadow:inset 0 0 0 2px #c9ae5c;padding:14px;margin-bottom:14px}
+.note h3{color:#7a5f17}.note .muted{color:#6d5a2a}
+.pick{display:flex;gap:6px}.pick button{margin:4px 0 8px;padding:10px 0;font-size:12px}
+.stars{display:flex;gap:8px;justify-content:center;margin:6px 0 12px}.stars span{color:var(--line)}.stars span.on{color:var(--gold)}.stars svg.ic{width:34px;height:34px}
+.bars{display:flex;align-items:flex-end;gap:4px;height:120px;margin:8px 0 4px}.bars div{flex:1;text-align:center;font-size:11px;color:var(--mu);font-family:Pix}
+.bars i{display:block;background:var(--acc);border:2px solid var(--ink);margin-bottom:4px}.bars i.neg{background:var(--bad)}
+.ach{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ach div{border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--line);padding:10px 4px;text-align:center;font-size:12px;font-family:Pix;color:var(--gold)}
+.ach div span{display:block;color:var(--tx);margin-top:4px}.ach div.lock{opacity:.3;color:var(--mu)}.ach svg.ic{width:28px;height:28px}
+#toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--panel2);align-items:center;gap:10px;color:var(--acc);border:2px solid var(--acc);box-shadow:0 0 0 2px var(--ink);
+  padding:8px 16px;font-family:Pix;font-size:15px;display:none;z-index:30;max-width:90%;text-align:center}
+#modal{position:fixed;inset:0;background:rgba(5,7,5,.9);display:none;align-items:center;justify-content:center;z-index:25;padding:20px}
+#modal .panel{width:100%;max-width:380px;text-align:center}
+.ring{font-family:Pix;font-size:56px;font-weight:700;color:var(--acc);margin:10px 0}.ring.gold{color:var(--gold);font-size:40px}
+#splash{position:fixed;inset:0;background:var(--bg);z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .4s}
+#splash.out{opacity:0;pointer-events:none}#splash .blink{animation:blink 1s steps(1) infinite;margin-top:18px;font-family:Pix;letter-spacing:2px}
+#ob{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;padding:20px 16px 30px;display:none}
+.dots{display:flex;gap:6px;justify-content:center;margin:6px 0 16px}.dots i{width:10px;height:10px;background:var(--line);border:2px solid var(--ink)}.dots i.on{background:var(--acc)}
+ol{padding-left:20px;margin:6px 0}li{margin:5px 0}
+.nc{display:flex;gap:12px;align-items:center}
+.nlogo{width:54px;height:54px;flex:none;display:flex;align-items:center;justify-content:center;background:#f2efe6;color:#111;border:2px solid var(--ink);box-shadow:inset 0 0 0 2px #c9c4b8,0 3px 0 var(--ink)}
+.nst{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px}.nst i{width:10px;height:10px;flex:none;border:2px solid var(--ink);background:var(--mu)}
+.ckh{display:flex;align-items:center;gap:4px;background:var(--panel);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--line);padding:6px}
+.ckt{flex:1;min-width:0;margin-left:4px}.ckt .px:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}.ckh .nst{margin-top:0}
+.nlogo.sm{width:32px;height:32px;box-shadow:inset 0 0 0 2px #c9c4b8}
+.nst i.ok{background:var(--acc)}.nst i.gold{background:var(--gold)}.nst i.bad{background:var(--bad)}
+/* Journey */
+.jcard{position:relative;background:var(--panel);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--line);margin-bottom:14px;overflow:hidden}
+.jcard img{display:block;width:100%;height:170px;object-fit:cover;object-position:center 30%;image-rendering:pixelated;border-bottom:2px solid var(--ink)}
+.jcard .jb{padding:12px 14px 2px}.jcard.lock img{filter:grayscale(.8) brightness(.55)}.jcard.lock h2{color:var(--mu)}
+.jduo{display:flex}.jduo img{width:50%}
+.rib{position:absolute;top:16px;right:-38px;transform:rotate(35deg);background:var(--gold);color:#2a1d00;font-family:Pix;padding:3px 44px;border:2px solid var(--ink);font-size:12px;letter-spacing:1px}.rib.ok{background:var(--acc);color:#10200a}
+.jtabs{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:0 16px 4px;scrollbar-width:none}.jtabs::-webkit-scrollbar{display:none}.jtabs button{flex:none;width:auto;margin:0 0 4px;padding:7px 10px;font-size:12px}
+.jwrap{position:relative;margin:10px 0 14px}
+#jmap{height:58vh;overflow-y:auto;border:2px solid var(--ink);box-shadow:0 0 0 2px var(--line);background:#0a0c0a;scrollbar-width:none}#jmap::-webkit-scrollbar{display:none}
+#jmap svg{display:block;width:100%;height:auto;shape-rendering:crispEdges}
+.jlab{font-family:Pix,monospace;font-size:11px;fill:#e8eddc;paint-order:stroke;stroke:#050705;stroke-width:3px;letter-spacing:.5px}.jlab2{font-family:Pix,monospace;font-size:9px;fill:#c9d1bd;paint-order:stroke;stroke:#050705;stroke-width:3px}
+.jglow{animation:blink 1s steps(1) infinite}
+.jban{position:absolute;left:6px;top:6px;z-index:2;background:rgba(5,7,5,.85);border:2px solid var(--gold);color:var(--gold);padding:3px 8px;font-size:12px;pointer-events:none}
+.jstrip{position:absolute;right:4px;top:6px;bottom:6px;width:12px;z-index:2;background:#0a0c0a;border:2px solid var(--ink);box-shadow:0 0 0 1px var(--line)}
+.jstrip i{position:absolute;left:0;right:0}.jstrip b{position:absolute;left:-4px;width:16px;height:6px;margin-top:-3px;background:var(--acc);border:2px solid var(--ink)}
+.jpic{display:block;width:100%;max-height:200px;object-fit:cover;object-position:top;image-rendering:pixelated;border:2px solid var(--ink);box-shadow:0 0 0 2px var(--line);margin:0 0 12px}
+.jth{width:64px;height:64px;object-fit:cover;object-position:top;border:2px solid var(--ink);flex:none;image-rendering:pixelated}.jth.sm{width:40px;height:40px}
+details.jt{border-top:2px solid var(--panel2);padding:8px 0}details summary{list-style:none;cursor:pointer}details summary::-webkit-details-marker{display:none}
+details.jt summary{display:flex;justify-content:space-between;align-items:center;gap:8px}details.jt[open] summary{color:var(--acc)}
+.mb{font-family:Pix,monospace;font-size:11px;padding:1px 6px;border:2px solid currentColor;white-space:nowrap;flex:none}
+.amap{height:62vh;overflow-y:auto;border:2px solid var(--ink);box-shadow:0 0 0 2px var(--line);background:#0b1020;scrollbar-width:none}.amap::-webkit-scrollbar{display:none}.amap svg{display:block;width:100%;height:auto;shape-rendering:crispEdges}
+@keyframes atw{50%{opacity:.15}}.astar{animation:atw 2.4s steps(2) infinite}
+@keyframes acl{from{transform:translateX(-90px)}to{transform:translateX(400px)}}.aclo{animation:acl 26s linear infinite}
+@keyframes aneon{0%,100%{opacity:1}45%{opacity:1}50%{opacity:.4}55%{opacity:1}70%{opacity:.75}}.aneon{animation:aneon 2.2s steps(1) infinite}
+@keyframes abeam{from{transform:rotate(-22deg)}to{transform:rotate(22deg)}}.abeam{transform-box:fill-box;transform-origin:50% 100%;animation:abeam 3.5s ease-in-out infinite alternate}
+@keyframes awin{50%{fill:#3b5a8a}}.awin{animation:awin 1.6s steps(1) infinite}
+@media (prefers-reduced-motion:reduce){.astar,.aclo,.aneon,.abeam,.awin{animation:none}#ahero{transition:none!important}}
+.atask{align-items:flex-start;gap:10px;cursor:pointer}.atask.on>span:last-child{color:var(--mu)}.abox{flex:none;width:22px;height:22px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--acc);font-weight:700;margin-top:1px}.atask.on .abox{border-color:var(--acc);background:#16260f}
+.asubs{display:block;color:var(--mu);font-size:12px;margin-top:2px}
+.jbl{position:absolute;left:6px;top:36px;z-index:2;background:rgba(40,8,8,.92);border:2px solid var(--bad);color:var(--bad);padding:3px 8px;font-size:12px;cursor:pointer}
+.lad{border-top:2px solid var(--panel2);padding:7px 0}.lsteps{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}.lsteps button{width:auto;margin:0 0 3px;padding:4px 7px;font-size:11px}
+.pick button.sm{flex:1;padding:8px 2px;font-size:11px}
+.ms0{color:var(--mu)}.ms1{color:#7fa7d9}.ms2{color:var(--gold)}.ms3{color:#e39a4d}.ms4{color:#c08ad9}.ms5{color:var(--acc)}.ms6{color:#2a2108;background:var(--gold);border-color:var(--gold)}
+.jsc .bar{margin:2px 0 4px}
+</style></head>
+<body>
+<section class="view" id="v-home"></section><section class="view" id="v-log"></section><section class="view" id="v-meal"></section>
+<section class="view" id="v-workout"></section><section class="view" id="v-sleep"></section><section class="view" id="v-steps"></section>
+<section class="view" id="v-habits"></section><section class="view" id="v-mental"></section><section class="view" id="v-stats"></section><section class="view" id="v-me"></section><section class="view" id="v-cockpit"></section>
+<section class="view" id="v-journey"></section><section class="view" id="v-studio"></section><section class="view" id="v-gate"></section><section class="view" id="v-audit"></section><section class="view" id="v-jsub"></section><section class="view" id="v-chap"></section><section class="view" id="v-acc"></section><section class="view" id="v-afloor"></section><section class="view" id="v-lab"></section><section class="view" id="v-lproj"></section><section class="view" id="v-rstart"></section>
+<nav id="nav"></nav>
+<div id="toast"></div><div id="modal"></div><div id="ob"></div><div id="splash" onclick="hideSplash()"></div>
+<script src="edition.js"></script><script src="art.js"></script><script>document.documentElement.style.setProperty('--av', 'url("' + jImg('portrait') + '")');</script><script src="logic.js"></script><script src="gate.js"></script><script src="acc.js"></script>
+<script>
+// Browser stub so the UI can be previewed outside the app.
+var A = window.Android || { copy: function () {}, readClipboard: function () { return prompt('Paste ChatGPT result') || ''; }, pickPhoto: function () {}, hasPhoto: function () { return false; },
+  clearPhoto: function () {}, askChatGPT: function (p) { alert(p); }, stepState: function () { return ''; },
+  hasUsage: function () { return false; }, openUsageSettings: function () {}, usage: function () { return ''; }, exportBackup: function (t) { alert(t.length + ' chars'); }, pickBackup: function () {}, hasStepsPerm: function () { return false; }, hasStepSensor: function () { return true; }, requestSteps: function () {}, hasChatGPT: function () { return false; }, hasAutoGPT: function () { return false; }, openAutoGPTSettings: function () {}, takeGptResult: function () { return ''; },
+  // Notion stub: real checks live in NotionLink.java; this only lets the card be previewed in a browser.
+  _nu: '', notionState: function () { return JSON.stringify({ url: this._nu || 'https://www.notion.so/Example-Cockpit-0123456789abcdef0123456789abcdef', isDefault: !this._nu, lastOpen: this._no || 0, online: navigator.onLine, browser: 'Chrome', customTab: true }); },
+  setNotionUrl: function (u) { if (!/^https:\/\/([a-z0-9-]+\.)*notion\.(so|com|site)(\/\S*)?$/i.test(u.trim())) return 'Only notion.so, notion.com or notion.site links are allowed.'; this._nu = u.trim(); return ''; },
+  resetNotionUrl: function () { this._nu = ''; }, notionShow: function () {}, notionNav: function () {}, openNotion: function (u) { if (!u) this._no = Date.now(); window.open(u || JSON.parse(this.notionState()).url, '_blank', 'noopener'); return ''; } };
+var KEY = (window.EDITION && EDITION.key) || 'alive', DEF = { profile: { name: 'Hero', age: '', weight: '', goals: { kcal: 2200, protein: 120, carbs: 250, fat: 65, steps: 8000, sleep: 7, screen: 120 } }, days: {} };
+var D; try { D = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+D = D || JSON.parse(JSON.stringify(DEF));
+var today = L.ymd(new Date()), cur = today, stack = ['home'], draft = {}, pend = null, R = {};
+if (!D.xp) { L.migrateXP(D, today); save(); } // 2.4: one-time switch to XP rules v2, keeps your level
+function G() { return D.profile.goals; }
+function save() { localStorage.setItem(KEY, JSON.stringify(D)); }
+function day(d) { d = d || cur; return D.days[d] || (D.days[d] = { date: d }); }
+function logged(d) { return L.logged(D.days[d.date]); }
+function peek(d) { return D.days[d] || { date: d }; }
+function $(id) { return document.getElementById(id); }
+function val(id) { return $(id).value.trim(); }
+function num(id) { return L.n($(id).value); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
+function pct(a, b) { return Math.round(L.clamp(b ? a / b * 100 : 0, 0, 100)); }
+function bar(p, cls) { return '<div class="bar ' + (cls || '') + '"><i style="width:' + p + '%"></i></div>'; }
+function v(name, html) { $('v-' + name).innerHTML = html; }
+function hdr(t) { return '<div class="top"><button class="ghost" onclick="goBack()" aria-label="Back">' + ico('back', 24) + '</button><h1>' + t + '</h1></div>'; }
+function toast(t, f) { var e = $('toast'); e.innerHTML = (f ? face(f, 30) : '') + '<span>' + esc(t) + '</span>'; e.style.display = 'flex'; clearTimeout(e._t); e._t = setTimeout(function () { e.style.display = 'none'; }, 2400); }
+function buzz(p) { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
+function hm(d) { return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function fmt(n) { return Math.round(n).toLocaleString('en-IN'); }
+
+// ---------- pixel icons (12x12, # = filled) ----------
+var IC = {
+  home: ['.....##.....', '....####....', '...######...', '..########..', '.##########.', '############', '.##......##.', '.##.####.##.', '.##.#..#.##.', '.##.#..#.##.', '.##.#..#.##.', '.##########.'],
+  plus: ['............', '.....##.....', '.....##.....', '.....##.....', '.....##.....', '.##########.', '.##########.', '.....##.....', '.....##.....', '.....##.....', '.....##.....', '............'],
+  stats: ['............', '.........##.', '.........##.', '.....##..##.', '.....##..##.', '.....##..##.', '.##..##..##.', '.##..##..##.', '.##..##..##.', '.##..##..##.', '############', '............'],
+  me: ['....####....', '...######...', '...######...', '...######...', '....####....', '............', '..########..', '.##########.', '.##########.', '.##########.', '.##########.', '............'],
+  meal: ['...#..#..#..', '..#..#..#...', '...#..#..#..', '............', '############', '############', '.##########.', '.##########.', '..########..', '...######...', '....####....', '............'],
+  workout: ['............', '............', '.##......##.', '.##......##.', '###......###', '############', '############', '###......###', '.##......##.', '.##......##.', '............', '............'],
+  sleep: ['............', '............', '#...........', '#.###.......', '#.###.......', '#.##########', '############', '############', '#..........#', '#..........#', '............', '............'],
+  steps: ['............', '............', '..###.......', '..###.......', '..####......', '..#######...', '..#########.', '.###########', '############', '############', '............', '............'],
+  habits: ['...........#', '..........#.', '...........#', '..........#.', '............', '#########.##', '#.......#.##', '#########.##', '............', '............', '............', '............'],
+  mental: ['...#####....', '..#######...', '.#########..', '.#####.###..', '.#########..', '.##########.', '..#########.', '..######....', '..#####.....', '..#####.....', '..#####.....', '............'],
+  fire: ['.....#......', '.....##.....', '....###.....', '....####.#..', '...#######..', '..########..', '..###.####..', '.###...####.', '.###...####.', '.####.#####.', '..########..', '...######...'],
+  heart: ['............', '.###...###..', '#####.#####.', '###########.', '###########.', '###########.', '.#########..', '..#######...', '...#####....', '....###.....', '.....#......', '............'],
+  bolt: ['......####..', '.....####...', '....####....', '...####.....', '..########..', '.....####...', '....####....', '...####.....', '..###.......', '.##.........', '.#..........', '............'],
+  phone: ['..########..', '..#......#..', '..#......#..', '..#......#..', '..#......#..', '..#......#..', '..#......#..', '..#......#..', '..#......#..', '..###..###..', '..########..', '............'],
+  camera: ['............', '....###.....', '.##########.', '############', '####....####', '###......###', '###......###', '####....####', '############', '.##########.', '............', '............'],
+  image: ['############', '#..........#', '#.##.......#', '#.##.......#', '#..........#', '#.....#....#', '#....###...#', '#...#####..#', '#..#######.#', '#.#########.', '############', '............'],
+  clip: ['....####....', '.###....###.', '.#..####..#.', '.#........#.', '.#.######.#.', '.#........#.', '.#.######.#.', '.#........#.', '.#.####...#.', '.#........#.', '.##########.', '............'],
+  send: ['......######', '.........###', '........####', '.......###.#', '......###..#', '.....###....', '....###.....', '#..###......', '#.###.......', '#...........', '#...........', '#########...'],
+  check: ['............', '...........#', '..........##', '.........##.', '........##..', '#......##...', '##....##....', '.##..##.....', '..####......', '...##.......', '............', '............'],
+  x: ['............', '.##......##.', '..##....##..', '...##..##...', '....####....', '.....##.....', '....####....', '...##..##...', '..##....##..', '.##......##.', '............', '............'],
+  back: ['............', '....#.......', '...##.......', '..##........', '.##########.', '############', '.##########.', '..##........', '...##.......', '....#.......', '............', '............'],
+  star: ['.....##.....', '.....##.....', '....####....', '############', '.##########.', '..########..', '...######...', '..###..###..', '..##....##..', '.##......##.', '............', '............'],
+  note: ['##########..', '#........##.', '#.######..##', '#.........##', '#.######..#.', '#.........#.', '#.#####...#.', '#.........#.', '#.........#.', '###########.', '............', '............'],
+  shield: ['.##########.', '.#........#.', '.#.######.#.', '.#.######.#.', '.#.######.#.', '.#.######.#.', '..#.####.#..', '..#.####.#..', '...#.##.#...', '....#..#....', '.....##.....', '............'],
+  crown: ['............', '#....#....#.', '##..###..##.', '###.###.###.', '###########.', '###########.', '###########.', '###########.', '............', '###########.', '............', '............'],
+  next: ['............', '..##........', '..####......', '..######....', '..########..', '..#########.', '..#########.', '..########..', '..######....', '..####......', '..##........', '............'],
+  dot: ['............', '............', '............', '............', '....####....', '...######...', '...######...', '....####....', '............', '............', '............', '............'],
+  notion: ['............', '.####...###.', '..###....#..', '..####...#..', '..#.##...#..', '..#..##..#..', '..#...##.#..', '..#....###..', '..#.....##..', '.###.....#..', '............', '............'],
+  reload: ['............', '...#####.#..', '..##...###..', '.##....###..', '.##...####..', '.##.........', '.##.........', '.##.....##..', '..##...##...', '...#####....', '............', '............'],
+  flag: ['.##.........', '.#######....', '.#########..', '.#########..', '.#######....', '.##.........', '.##.........', '.##.........', '.##.........', '.##.........', '####........', '............'],
+  mount: ['............', '.....##.....', '....####....', '...######...', '...##.###...', '..##...###..', '..#.....##..', '.##......##.', '.#........#.', '##.........#', '############', '............'],
+  sword: ['..........##', '.........###', '........###.', '.......###..', '......###...', '.#...###....', '.##.###.....', '..####......', '...##.......', '..####......', '.##..#......', '##..........'],
+  lock: ['....####....', '...#....#...', '..#......#..', '..#......#..', '.##########.', '.##########.', '.####..####.', '.####..####.', '.#####.####.', '.##########.', '.##########.', '............'],
+  chest: ['............', '..########..', '.#........#.', '############', '#....##....#', '############', '#....##....#', '#..........#', '#..........#', '############', '............', '............'],
+  gear: ['.....##.....', '..#.####.#..', '.##########.', '..###..###..', '.###....###.', '####....####', '####....####', '.###....###.', '..###..###..', '.##########.', '..#.####.#..', '.....##.....']
+};
+var icoCache = {};
+function ico(n, s) {
+  if (!icoCache[n]) icoCache[n] = IC[n].map(function (r, y) { var o = '', x = 0; while (x < 12) { if (r[x] === '#') { var e = x; while (e < 12 && r[e] === '#') e++; o += 'M' + x + ' ' + y + 'h' + (e - x) + 'v1h-' + (e - x) + 'z'; x = e; } else x++; } return o; }).join('');
+  return '<svg class="ic" viewBox="0 0 12 12"' + (s ? ' style="width:' + s + 'px;height:' + s + 'px"' : '') + '><path d="' + icoCache[n] + '"/></svg>';
+}
+
+// ---------- avatar ----------
+function face(k, s) { return '<div class="face" style="width:' + s + 'px;height:' + s + 'px"></div>'; }
+// Avatar: the ALIVE? portrait (assets/avatar.png). Tap it and it hops.
+function body(scale, cls) {
+  var s = 64 * scale;
+  return '<div class="avw ' + (cls || '') + '"><img class="av bob" src="' + jImg('portrait') + '" alt="" onclick="buzz(12);react(\'hop\')" style="width:' + s + 'px;height:' + s + 'px"><div class="shadow" style="width:' + Math.round(s * .9) + 'px"></div></div>';
+}
+function avatar() { return document.querySelector('.view.on .av, #modal .av') || document.querySelector('#ob .av'); }
+function react(cls) { var a = avatar(); if (!a) return; var w = a.parentNode; w.classList.remove('hop', 'shake'); void w.offsetWidth; w.classList.add(cls); setTimeout(function () { w.classList.remove(cls); }, 600); }
+function score(v, need) { return v == null ? '<b>—</b><span class="muted">' + need + '</span>' : '<b>' + v + '%</b>' + bar(v, v < 40 ? 'bad' : v < 65 ? 'gold' : ''); }
+function haInfo() {
+  var ha = L.healthAge(L.n(D.profile.age), lastN(7).filter(logged), G());
+  if (!ha) return toast(D.profile.age ? 'Needs 3 logged days in the last 7' : 'Set your age in Me');
+  modal('<h2>Health age ' + ha.age + '</h2><div class="muted" style="margin:6px 0 10px">Real age ' + esc(D.profile.age) + ', from ' + ha.days + ' logged days. Rule of thumb, not medical.</div>' +
+    (ha.factors.length ? ha.factors.map(function (f) { return '<div class="item"><span>' + f[0] + '</span><b class="px ' + (f[1] > 0 ? 'neg' : 'ok') + '">' + (f[1] > 0 ? '+' : '') + f[1] + 'y</b></div>'; }).join('') : '<div class="muted">Nothing moved it yet.</div>') +
+    '<div class="muted" style="margin-top:8px">Anything you never logged is left out, not guessed. Smoking uses 11 min of life per cigarette (Shaw et al, BMJ 2000), a crude average from male smokers.</div><button class="pri" onclick="closeModal()">OK</button>');
+}
+
+function xpOf(d) { return L.dayXP(peek(d), G()).xp; }
+function totalXP() { return L.totalXP(D, G()); }
+function lastN(n, end) { var a = []; for (var i = n - 1; i >= 0; i--) a.push(peek(L.addDays(end || today, -i))); return a; }
+// Wrap any change: save, then show the XP it earned (and level-ups).
+function award(fn) {
+  var b = xpOf(cur), lv = L.level(totalXP()).lv; fn(); save();
+  var d = xpOf(cur) - b, nl = L.level(totalXP());
+  if (nl.lv > lv) levelUp(nl); else { toast(d ? (d > 0 ? '+' : '') + d + ' XP' : 'Saved', d > 0 ? (d >= 40 ? 'laugh' : 'smile') : d < 0 ? 'worried' : null); buzz(d > 0 ? 25 : d < 0 ? [20, 40, 20] : 10); react(d < 0 ? 'shake' : 'hop'); }
+}
+function levelUp(l) { buzz([40, 60, 40, 60, 120]); modal('<div style="display:flex;justify-content:center;margin-top:10px">' + body(2, 'jump') + '</div><div class="ring gold">LEVEL ' + l.lv + '</div><h2>' + l.title + '</h2><button class="pri" onclick="closeModal()">Continue</button>'); }
+function modal(h) { var m = $('modal'); m.innerHTML = '<div class="panel">' + h + '</div>'; m.style.display = 'flex'; nSync(); }
+function closeModal() { $('modal').style.display = 'none'; clearInterval(urgeT); nSync(); }
+
+var NAV = [['home', 'home', 'Home'], ['log', 'plus', 'Log'], ['stats', 'stats', 'Stats'], ['cockpit', 'notion', 'Cockpit'], ['journey', 'flag', 'Journey'], ['me', 'me', 'Me']];
+// Modules you switched off disappear. No D.mods (data from before modules existed) = everything on.
+var MODS = [['journeys', 'Journeys', 'GATE, placement tower and your lab, played as maps.', 1], ['notion', 'Notion cockpit', 'Opens your own Notion page inside the app.', 0], ['sens', 'Sensitive habits', 'Pornography and masturbation tracking (18+).', 0]];
+function mod(k) { return !D.mods || D.mods[k] !== false; }
+function habitKeys() { return Object.keys(L.BAD).filter(function (k) { return mod('sens') || (k !== 'porn' && k !== 'mast'); }); }
+function navDraw() { $('nav').innerHTML = NAV.filter(function (n) { return (n[0] !== 'cockpit' || mod('notion')) && (n[0] !== 'journey' || mod('journeys')); }).map(function (n) { return '<button data-v="' + n[0] + '" onclick="go(\'' + n[0] + '\',1)">' + ico(n[1], 24) + n[2] + '</button>'; }).join(''); }
+navDraw();
+function modBoxes(pre) { return MODS.map(function (m) { var on = pre ? m[3] : mod(m[0]); return '<label class="item" style="font-size:15px;text-transform:none;letter-spacing:0;color:var(--tx)"><span>' + m[1] + '<br><span class="muted" style="font-size:12px">' + m[2] + '</span></span><input type="checkbox" id="md_' + m[0] + '"' + (on ? ' checked' : '') + '></label>'; }).join(''); }
+function modRead() { if (!$('md_journeys')) return; D.mods = {}; MODS.forEach(function (m) { D.mods[m[0]] = $('md_' + m[0]).checked; }); }
+function modSave() { modRead(); save(); navDraw(); toast('Saved'); R.me(); }
+function go(name, root) { if (root) stack = [name]; else stack.push(name); show(); }
+function goBack() {
+  if ($('ob').style.display === 'block') { if (obStep > 0) { obSave(); ob(obStep - 1); return true; } return false; }
+  if ($('modal').style.display === 'flex') { closeModal(); return true; }
+  if (stack.length < 2) { if (stack[0] === 'home') return false; stack = ['home']; } else stack.pop(); show(); return true;
+}
+function show() {
+  var n = stack[stack.length - 1];
+  document.querySelectorAll('.view').forEach(function (e) { e.classList.toggle('on', e.id === 'v-' + n); });
+  document.querySelectorAll('nav button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === stack[0]); });
+  R[n](); window.scrollTo(0, 0); countUp(); nSync();
+}
+// Numbers tick up to their value (elements with data-n).
+function countUp() {
+  document.querySelectorAll('.view.on [data-n]').forEach(function (e) {
+    var to = +e.dataset.n, t0 = performance.now(); if (!to) return;
+    (function f(t) { var k = Math.min(1, (t - t0) / 450); e.textContent = fmt(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f); })(t0);
+  });
+}
+
+// ---------- sensors ----------
+var stepInfo = null;
+function refreshSensors() {
+  var t = L.ymd(new Date()); if (t !== today) { if (cur === today) cur = t; today = t; }
+  var ss = null; try { ss = JSON.parse(A.stepState() || 'null'); } catch (e) {}
+  stepInfo = ss;
+  if (ss && ss.date === today && ss.steps > 0) (day(today).steps = day(today).steps || {}).phone = ss.steps; // no reading yet = no data, not 0
+  // Yesterday closed at midnight with its full count, even if the app was last opened in the evening.
+  if (ss && ss.prevDate && ss.prevDate < today && ss.prevSteps > 0) { var ps = day(ss.prevDate).steps = day(ss.prevDate).steps || {}; if (!(ps.phone >= ss.prevSteps)) ps.phone = ss.prevSteps; }
+  if (A.hasUsage()) {
+    var t0 = new Date(today + 'T00:00:00').getTime();
+    var u = usageOf(t0, Date.now()); if (u) day(today).screen = u;
+    // Finish past days (Android keeps ~7 days of events) so they aren't stuck at the last time the app was open.
+    for (var k = 1; k <= 6; k++) {
+      var dd = L.addDays(today, -k), x = D.days[dd];
+      if (x && x.screen && x.screen.final) continue;
+      var st = new Date(dd + 'T00:00:00').getTime(), pu = usageOf(st, new Date(L.addDays(dd, 1) + 'T00:00:00').getTime());
+      if (pu && (pu.min > 0 || x)) { pu.final = true; day(dd).screen = pu; }
+    }
+  }
+  save();
+}
+function usageOf(a, b) {
+  try { var u = JSON.parse(A.usage(a, b)); u.apps.sort(function (x, y) { return y.min - x.min; }); u.apps = u.apps.filter(function (x) { return x.min > 0; }).slice(0, 8); return u; } catch (e) { return null; }
+}
+function pickTxt(sc) { return sc.pickups < 0 ? '' : ' · ' + sc.pickups + ' ' + (sc.pickKind || 'unlocks'); }
+function onAppResume() {
+  refreshSensors(); var n = stack[stack.length - 1]; if (D.onboarded) autoBackup('opened');
+  if ($('ob').style.display === 'block') { obSave(); return ob(obStep); }
+  var gr = null; try { gr = JSON.parse(A.takeGptResult() || 'null'); } catch (e) {}
+  if (gr) { if (gr.error) { toast(gr.error); if (stack[stack.length - 1] !== gr.kind) go(gr.kind); } else fetchAI(gr.kind, false, gr.text); return; }
+  if (pend && !A.hasAutoGPT()) setTimeout(function () { fetchAI(pend, true); }, 700); // clipboard readable only once window has focus
+  else if (n === 'home' || n === 'habits' || n === 'steps') R[n]();
+}
+function onPhoto() { toast('Photo ready'); var n = stack[stack.length - 1]; if (n === 'meal' || n === 'studio') R[n](); }
+
+// ---------- ChatGPT bridge flow ----------
+var PROMPT = {
+  meal: function (t) { return 'You are a nutrition estimator. Estimate the food ' + (A.hasPhoto() ? 'in this photo' : '') + (t ? (A.hasPhoto() ? '. Extra info: ' : 'described here: ') + t : '') + '. Use typical Indian portions when relevant. Only list foods that are visible or that I described; do not invent items. If the photo or description is unclear, say so in note and set confidence to low.\nReply with ONLY this JSON, no other text:\n{"name":"short meal name","items":[{"food":"","qty":"","kcal":0,"p":0,"c":0,"f":0}],"kcal":0,"p":0,"c":0,"f":0,"fiber":0,"confidence":"high|medium|low","note":"one short tip"}\np, c, f, fiber are grams.'; },
+  workout: function (t) { return 'You are a fitness coach. My body weight is ' + (D.profile.weight || 70) + ' kg. Workout: ' + t + '\nEstimate calories burned (MET-based, for my weight) and muscles trained. Only include exercises I listed; do not invent sets or weights. If details are missing, say so in note and set confidence to low. Reply with ONLY this JSON, no other text:\n{"title":"short title","duration_min":0,"kcal":0,"intensity":"low|moderate|high","muscles":["chest"],"exercises":[{"name":"","sets":0,"reps":"","weight":""}],"confidence":"high|medium|low","note":"one short recovery tip"}'; }
+};
+function sendAI(kind) {
+  var t = val(kind === 'meal' ? 'mtext' : 'wtext');
+  if (!t && !(kind === 'meal' && A.hasPhoto())) return toast(kind === 'meal' ? 'Add a photo or describe it' : 'Describe the workout');
+  pend = kind; keepTmp(kind); A.askChatGPT(kind, PROMPT[kind](t), kind === 'meal');
+}
+var TMP = KEY + '_tmp';
+function keepTmp(view) { try { localStorage.setItem(TMP, JSON.stringify({ pend: pend, draft: draft, view: view, at: Date.now() })); } catch (e) {} }
+function dropTmp() { localStorage.removeItem(TMP); }
+function photo(cam) { draft.mealText = val('mtext'); keepTmp('meal'); A.pickPhoto(cam); }
+function fetchAI(kind, silent, text) {
+  try {
+    var o = L.parseAI(text || A.readClipboard());
+    if (kind === 'meal') draft.meal = L.normMeal(o); else draft.workout = L.normWorkout(o);
+    pend = null; keepTmp(kind); toast('Got it. Check, then save.'); buzz(20);
+    if (stack[stack.length - 1] === kind) R[kind](); else go(kind);
+  } catch (e) { if (!silent) toast(/prompt/.test(e.message) ? 'That\'s still the prompt. Copy ChatGPT\'s answer.' : 'No ChatGPT answer in clipboard yet'); }
+}
+function autoLine() {
+  return A.hasAutoGPT() ? '<div class="muted ok">Auto mode on: ChatGPT answers and this fills in by itself.</div>'
+    : '<div class="muted">Manual: in ChatGPT tap Copy on the answer and come back.</div><button class="sm" style="margin-top:8px" onclick="A.openAutoGPTSettings()">Turn on auto mode</button>';
+}
+function aiResult(d) {
+  return (d.confidence ? '<div class="muted ' + (d.confidence === 'high' ? 'ok' : 'warn') + '">ChatGPT confidence: ' + esc(d.confidence) + (d.confidence === 'high' ? '' : ' — check the numbers') + '</div>' : '') +
+    (d.note ? '<div class="muted" style="margin-top:4px">' + esc(d.note) + '</div>' : '');
+}
+
+// ---------- Home ----------
+function daysSinceWorkout() { for (var i = 0; i < 60; i++) { var d = D.days[L.addDays(today, -i)]; if (d && (d.workouts || []).length) return i; } return null; }
+// One honest line about today, built from what you logged. No pep talk.
+function verdict(d, x, g) {
+  var hr = new Date().getHours(), st = L.steps(d), sc = d.screen, h = d.habits || {}, y = peek(L.addDays(today, -1)), yh = y.habits || {};
+  var slips = Object.keys(L.BAD).filter(function (k) { return k !== 'smoke' && h[k]; }).map(function (k) { return L.BAD[k].label.toLowerCase(); });
+  if (L.n(h.smoke)) return L.n(h.smoke) + ' cigarette' + (L.n(h.smoke) > 1 ? 's' : '') + ' today = ' + L.fmtMin(L.lifeLost(h.smoke)) + ' of life' + (y.habitsSaved ? ', ' + L.n(yh.smoke) + ' yesterday.' : '.') + (slips.length ? ' Also: ' + slips.join(', ') + '.' : '');
+  if (slips.length) return 'Slipped today: ' + slips.join(', ') + '. Write down what set it off.';
+  if (!d.sleep && hr < 12) return 'No sleep logged yet.';
+  if (d.sleep && d.sleep.hours < g.sleep - 1) return 'Slept ' + d.sleep.hours + 'h. Go easy on training today.';
+  if (sc && sc.min > g.screen) return sc.min + ' min on the phone. Your limit is ' + g.screen + '.';
+  var ds = daysSinceWorkout(); if (ds != null && ds >= 3) return 'No workout in ' + ds + ' days.';
+  if (hr >= 16 && L.hasSteps(d) && st < g.steps) return fmt(st) + ' steps. ' + fmt(g.steps - st) + ' to go.';
+  if (hr >= 19 && !d.workDone) return 'Sticky note done? Claim it before bed.';
+  if (x.xp > 0) return '+' + x.xp + ' XP so far today.';
+  return 'Nothing logged yet today.';
+}
+// The single most useful next log.
+function nextAction(d) {
+  var hr = new Date().getHours();
+  if (!d.sleep && hr < 14) return ['sleep', 'Log sleep'];
+  if (!(d.meals || []).length && hr >= 10) return ['meal', 'Log a meal'];
+  if (hr >= 19 && !d.habitsSaved) return ['habits', 'Save today\'s habits'];
+  if (hr >= 19 && !d.workDone) return ['log', 'Sticky note done?'];
+  if (!(d.mental || []).length && hr >= 12) return ['mental', 'Mind check-in'];
+  return ['log', 'Log something'];
+}
+function calendar() {
+  var cells = '';
+  for (var i = 34; i >= 0; i--) {
+    var k = L.addDays(today, -i), d = D.days[k], c = '';
+    if (d && (L.logged(d) || d.screen)) { var xp = xpOf(k); c = L.badCount(d) ? 'bad' : xp < 25 ? 't0' : xp < 50 ? 't1' : xp < 75 ? 't2' : 't3'; }
+    cells += '<i class="' + c + (i === 0 ? ' now' : '') + '" title="' + k + '"></i>';
+  }
+  return '<div class="cal">' + cells + '</div><div class="legend muted"><span><i style="background:#283222"></i>low</span><span><i style="background:var(--acc)"></i>strong</span><span><i style="background:var(--bad)"></i>slip</span></div>';
+}
+R.home = function () {
+  var g = G(), d = peek(today), x = L.dayXP(d, g), tx = totalXP(), lv = L.level(tx), t = L.totals(d), st = L.steps(d);
+  var rec = L.recovery(d, peek(L.addDays(today, -1)), g), ms = L.mentalScore(d, g), ha = L.healthAge(L.n(D.profile.age), lastN(7).filter(logged), g);
+  var wk = d.workouts || [], na = nextAction(d), sc = d.screen;
+  var stat = function (ic, label, value, goal, unit, p, cls, view) {
+    return '<div class="stat" onclick="go(\'' + view + '\')">' + ico(ic) + '<span>' + label + '</span><span class="num">' + value + (goal ? '<small> / ' + goal + unit + '</small>' : '') + '</span>' + (p == null ? '' : bar(p, cls)) + '</div>';
+  };
+  var streaks = habitKeys().map(function (k) { var c = L.cleanStreak(D, k, today), h = d.habits || {}, hit = L.BAD[k].count ? L.n(h[k]) : h[k];
+    return '<span class="chip ' + (hit ? 'off' : c ? 'on' : '') + '">' + L.BAD[k].label + ' ' + (hit ? 'today' : c + 'd') + '</span>'; }).join('');
+  v('home',
+    updWarn() + bkWarn() + '<div class="row sp"><h1>ALIVE?</h1><span class="muted px">' + new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) + '</span></div>' +
+    '<div class="hero">' + body(2) + '<div class="info"><div class="muted px">' + esc(D.profile.name === 'Hero' ? 'Player 1' : D.profile.name) + '</div>' +
+      '<div style="margin:4px 0"><span class="lv">LV ' + lv.lv + '</span> <span class="px" style="font-size:17px">' + lv.title + '</span></div>' +
+      bar(pct(tx - lv.from, lv.to - lv.from), 'gold') + '<div class="row sp muted px"><span>' + fmt(tx - lv.from) + ' / ' + fmt(lv.to - lv.from) + ' XP</span><span>LV' + (lv.lv + 1) + ' at ' + fmt(lv.to) + '</span></div>' +
+      '<div class="px" style="margin-top:10px;font-size:13px;color:var(--mu)">TODAY</div><div class="big ' + (x.xp < 0 ? 'neg' : 'ok') + '">' + (x.xp > 0 ? '+' : '') + '<span data-n="' + Math.abs(x.xp) + '">' + Math.abs(x.xp) + '</span><small class="muted" style="font-size:14px"> / ' + L.DAY_MAX + '</small></div></div></div>' +
+    '<div class="say">' + esc(verdict(d, x, g)) + '</div>' +
+    '<button class="pri" onclick="go(\'' + na[0] + '\')">' + na[1] + ' ' + ico('next', 14) + '</button>' +
+    '<div class="panel"><h3>Today</h3>' +
+      stat('steps', 'Steps', L.hasSteps(d) ? '<span data-n="' + st + '">' + fmt(st) + '</span>' : '—', fmt(g.steps), '', pct(st, g.steps), '', 'steps') +
+      stat('workout', 'Workout', wk.length ? wk.reduce(function (a, w) { return a + w.kcal; }, 0) + ' kcal' : '—', '', '', null, '', 'workout') +
+      stat('sleep', 'Sleep', d.sleep ? d.sleep.hours + 'h' : '—', g.sleep, 'h', d.sleep ? pct(d.sleep.hours, g.sleep) : null, '', 'sleep') +
+      stat('fire', 'Calories', t.kcal ? '<span data-n="' + t.kcal + '">' + fmt(t.kcal) + '</span>' : '—', fmt(g.kcal), '', pct(t.kcal, g.kcal), t.kcal > g.kcal * 1.1 ? 'gold' : '', 'meal') +
+      '<div class="stat" onclick="go(\'meal\')">' + ico('meal') + '<span>Protein · carbs · fat</span><span class="num">' + Math.round(t.p) + '<small>/' + g.protein + 'g</small></span>' + bar(pct(t.p, g.protein)) +
+        '<span class="muted" style="grid-column:2/4">C ' + Math.round(t.c) + '/' + g.carbs + 'g · F ' + Math.round(t.f) + '/' + g.fat + 'g</span></div>' +
+      stat('phone', 'Phone', sc ? sc.min + 'm' : '—', sc ? g.screen : '', sc ? 'm' : '', sc ? pct(sc.min, g.screen) : null, sc && sc.min > g.screen ? 'bad' : '', 'habits') +
+      (sc ? '' : '<div class="muted" style="padding-top:6px">Phone time needs usage access: Me → Replay setup.</div>') + '</div>' +
+    '<div class="mini"><div>' + '<span class="muted">Recovery</span>' + score(rec, 'log sleep') + '</div>' +
+      '<div onclick="go(\'mental\')"><span class="muted">Mind</span>' + score(ms, 'check in') + '</div>' +
+      '<div onclick="haInfo()"><span class="muted">Health age</span><b>' + (ha ? ha.age : '—') + '</b><span class="muted">' + (!D.profile.age ? 'set age' : ha ? 'real ' + esc(D.profile.age) + ' · why?' : 'need 3 days') + '</span></div></div>' +
+    '<div class="panel"><h3>Last 5 weeks</h3>' + calendar() + '</div>' +
+    '<div class="panel" onclick="go(\'habits\')"><h3>Clean streaks</h3><div class="chips">' + streaks + '</div></div>' +
+    '<div class="panel"><h3>Quests</h3>' + x.items.map(function (i) {
+      var c = i.slip ? 'neg' : i.done ? 'done' : 'todo';
+      return '<div class="q ' + c + '"><span>' + ico(i.slip ? 'x' : i.done ? 'check' : 'dot') + esc(i.label) + '</span><span class="px">' + (i.slip ? 'SLIP' : '+' + i.xp) + '</span></div>'; }).join('') + '</div>' +
+    '<button onclick="urge()">' + ico('bolt', 18) + 'Urge? Ride it out</button>');
+};
+
+// ---------- Cockpit tab: the real notion website inside the app ----------
+// MainActivity lays a separate Notion WebView over this view, between the pixel header (#ckh) and the bottom nav.
+// That WebView has no Android bridge and only loads https Notion pages. nSync() decides when it shows: Cockpit tab open, no dialog, no load error.
+var nTitle = '', nCur = '', nErr = '', nLoading = false;
+function nState() { try { return JSON.parse((A.notionState && A.notionState()) || 'null'); } catch (e) { return null; } }
+function nPage(u) { // "…/My-Cockpit-0123…cdef?x" -> {name: 'My Cockpit', host: 'app.notion.com'}
+  var m = /^https:\/\/([^\/?#]+)([^?#]*)/i.exec(u || '') || [], seg = (m[2] || '').split('/').filter(Boolean).pop() || '', name = seg;
+  try { name = decodeURIComponent(seg); } catch (e) {}
+  return { name: name.replace(/-?[0-9a-f]{32}$/i, '').replace(/-/g, ' ').trim() || 'Notion page', host: (m[1] || '').toLowerCase() };
+}
+function nSync() {
+  if (!A.notionShow || !$('nav')) return;
+  var on = stack[stack.length - 1] === 'cockpit' && !nErr && $('modal').style.display !== 'flex' && $('ob').style.display !== 'block', h = $('ckh');
+  A.notionShow(on, h ? h.getBoundingClientRect().bottom + 4 : 0, $('nav').getBoundingClientRect().height);
+}
+// Called by MainActivity: loading | ready | url | title | error.
+function notionEv(k, x) {
+  if (k === 'loading') { nErr = ''; nLoading = true; nCur = x; } else if (k === 'ready') nLoading = false;
+  else if (k === 'url') nCur = x; else if (k === 'title') nTitle = x; else if (k === 'error') { nErr = x || 'Unknown error'; nLoading = false; }
+  if (stack[stack.length - 1] === 'cockpit' && $('modal').style.display !== 'flex') { R.cockpit(); nSync(); }
+}
+R.cockpit = function () {
+  var s = nState(); if (!s) return v('cockpit', '<h1>COCKPIT</h1>');
+  var st = nErr ? ['bad', 'Not loaded'] : nLoading ? ['gold', 'Loading…'] : nCur ? ['ok', 'Live · ' + nPage(nCur).host] : ['gold', 'Starting…'];
+  v('cockpit', '<div class="ckh" id="ckh"><button class="ghost" onclick="A.notionNav(\'back\')" aria-label="Back in Notion">' + ico('back', 22) + '</button>' +
+    '<div class="nlogo sm">' + ico('notion', 20) + '</div><div class="ckt"><div class="px">' + esc(nTitle || nPage(s.url).name) + '</div><div class="muted px nst"><i class="' + st[0] + '"></i><span>' + esc(st[1]) + '</span></div></div>' +
+    '<button class="ghost" onclick="A.notionNav(\'home\')" aria-label="Cockpit start page">' + ico('home', 20) + '</button>' +
+    '<button class="ghost" onclick="nRetry()" aria-label="Reload">' + ico('reload', 20) + '</button>' +
+    '<button class="ghost" onclick="notionCfg()" aria-label="Notion settings">' + ico('gear', 20) + '</button></div>' +
+    (nErr ? '<div class="panel ctr" style="margin-top:12px"><div class="nlogo" style="margin:4px auto 12px">' + ico('notion', 32) + '</div><h2>Notion didn\'t load</h2>' +
+      '<div class="muted" style="margin:6px 0">' + esc(nErr) + '. Check your internet, then retry.</div><button class="pri" onclick="nRetry()">Retry</button><button onclick="openNotion(nCur)">Open in Chrome</button></div>'
+      : '<div class="ctr muted px" style="margin-top:30vh">Opening your cockpit…</div>'));
+};
+function nRetry() { nErr = ''; A.notionNav('reload'); R.cockpit(); nSync(); }
+var nPend = '';
+function openNotion(u, force) {
+  nPend = u || ''; var r = A.openNotion(nPend, !!force);
+  if (!r) { buzz(12); return; }
+  if (r === 'offline') return modal('<h2>No internet</h2><div class="muted" style="margin:8px 0 6px">Notion needs a connection to load and save your pages. Pages you opened recently may still show.</div>' +
+    '<button class="pri" onclick="closeModal();openNotion(nPend,1)">Open anyway</button><button onclick="closeModal()">Cancel</button>');
+  if (r === 'nobrowser') return modal('<h2>No browser</h2><div class="muted" style="margin:8px 0 6px">Open in Chrome needs a browser. Install or enable Chrome, then try again.</div><button class="pri" onclick="closeModal()">OK</button>');
+  if ($('nerr')) $('nerr').textContent = r; else notionCfg(r); // bad saved link: show it where it can be fixed
+}
+function notionFail(msg) { toast(msg); }
+function notionCfg(msg) {
+  var s = nState() || { url: '' };
+  modal('<h2>Notion workspace</h2><div class="muted" style="margin:8px 0;text-align:left">Paste your page link (in Notion: Share → Copy link). It is saved on this phone only and never sent anywhere.</div>' +
+    '<input id="nu" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" value="' + esc(s.url) + '">' +
+    '<div id="nerr" class="neg" style="font-size:13px;min-height:18px;text-align:left">' + esc(msg || '') + '</div>' +
+    '<button class="pri" onclick="notionSave()">' + ico('check', 16) + 'Save link</button><button onclick="openNotion(val(\'nu\'))">Open in Chrome</button><button onclick="notionReset()">Restore default</button>' +
+    '<div class="muted" style="text-align:left;margin-top:4px"><b>Login:</b> in the Cockpit tap <b>Continue with email</b> and Notion mails a code to your Gmail. Google blocks its own sign-in button inside apps. Private pages and edit rights are up to Notion. ALIVE? never sees your password or cookies.</div>' +
+    '<button class="ghost" style="width:100%;margin-top:10px" onclick="closeModal()">Close</button>');
+}
+function notionSave() { var e = A.setNotionUrl(val('nu')); if (e) { $('nerr').textContent = e; buzz([20, 40, 20]); return; } nCur = nTitle = nErr = ''; closeModal(); toast('Notion link saved'); R[stack[stack.length - 1]](); }
+function notionReset() { A.resetNotionUrl(); nCur = nTitle = nErr = ''; closeModal(); toast('Default Notion link restored'); R[stack[stack.length - 1]](); }
+
+// ---------- Log hub ----------
+R.log = function () {
+  var d = day();
+  v('log', '<h1>LOG</h1><label style="margin-top:10px">Day</label><input type="date" value="' + cur + '" max="' + today + '" onchange="cur=this.value||today;R.log()">' +
+    '<div class="g3">' + [['meal', 'meal', 'Meal'], ['workout', 'workout', 'Workout'], ['sleep', 'sleep', 'Sleep'], ['steps', 'steps', 'Steps'], ['habits', 'habits', 'Habits'], ['mental', 'mental', 'Mind']]
+      .map(function (a) { return '<button style="flex-direction:column;padding:16px 4px;margin:0" onclick="go(\'' + a[0] + '\')">' + ico(a[1], 32) + a[2] + '</button>'; }).join('') + '</div>' +
+    '<div class="note" style="margin-top:18px"><h3>Sticky note</h3><div>Finished the to-do you wrote by hand today?</div>' +
+    '<button class="' + (d.workDone ? 'on' : 'pri') + '" onclick="toggleWork()">' + (d.workDone ? ico('check', 16) + 'Done · +8 claimed' : 'Yes, done · +8 XP') + '</button></div>' +
+    '<button onclick="urge()">' + ico('bolt', 18) + 'Urge? Ride it out · +3</button>');
+};
+function toggleWork() { award(function () { day().workDone = !day().workDone; }); R[stack[stack.length - 1]](); }
+
+// ---------- Meal ----------
+R.meal = function () {
+  var d = draft.meal || { name: '', kcal: '', p: '', c: '', f: '', items: [], note: '' }, ms = day().meals || [];
+  v('meal', hdr('MEAL') + '<div class="panel"><h3>What did you eat?</h3>' +
+    '<div class="row"><button onclick="photo(true)">' + ico('camera', 18) + 'Camera</button><button onclick="photo(false)">' + ico('image', 18) + 'Gallery</button></div>' +
+    '<div class="muted">' + (A.hasPhoto() ? '<span class="ok">Photo ready</span> · <u onclick="A.clearPhoto();R.meal()">remove</u>' : 'Photo is optional and never stored.') + '</div>' +
+    '<textarea id="mtext" placeholder="2 rotis, dal, rice, sabzi" oninput="draft.mealText=this.value">' + esc(draft.mealText || '') + '</textarea>' +
+    '<button class="pri" onclick="sendAI(\'meal\')">Ask ChatGPT ' + ico('send', 16) + '</button><button onclick="fetchAI(\'meal\')">' + ico('clip', 18) + 'Paste answer</button>' +
+    autoLine() + '</div>' +
+    '<div class="panel"><h3>Result</h3><label>Meal<input id="mn" value="' + esc(d.name) + '"></label>' +
+    '<div class="g4"><label>kcal<input id="mk" inputmode="decimal" value="' + d.kcal + '"></label><label>Protein<input id="mp" inputmode="decimal" value="' + d.p + '"></label>' +
+    '<label>Carbs<input id="mc" inputmode="decimal" value="' + d.c + '"></label><label>Fat<input id="mf" inputmode="decimal" value="' + d.f + '"></label></div>' +
+    d.items.map(function (i) { return '<div class="item muted"><span>' + esc(i.food) + ' ' + esc(i.qty) + '</span><span>' + i.kcal + ' kcal · P' + i.p + '</span></div>'; }).join('') +
+    aiResult(d) + '<button class="pri" onclick="saveMeal()">' + ico('check', 16) + 'Save meal</button></div>' +
+    '<div class="panel"><h3>' + (cur === today ? 'Today' : cur) + '</h3>' + (ms.length ? ms.map(function (m, i) { return '<div class="item"><span>' + esc(m.name) + '<br><span class="muted">' + esc(m.t) + ' · ' + L.n(m.kcal) + ' kcal · P' + L.n(m.p) + ' C' + L.n(m.c) + ' F' + L.n(m.f) + '</span></span><button class="ghost x" onclick="del(\'meals\',' + i + ')" aria-label="Delete">' + ico('x', 18) + '</button></div>'; }).join('') : '<div class="muted">No meals yet</div>') + '</div>');
+};
+function saveMeal() {
+  var m = { t: hm(new Date()), name: val('mn') || 'Meal', kcal: num('mk'), p: num('mp'), c: num('mc'), f: num('mf'), items: (draft.meal || {}).items || [], note: (draft.meal || {}).note || '' };
+  if (!m.kcal) return toast('Enter calories, or ask ChatGPT');
+  award(function () { (day().meals = day().meals || []).push(m); });
+  draft.meal = null; draft.mealText = ''; A.clearPhoto(); dropTmp(); R.meal();
+}
+function del(list, i) { if (!confirm('Delete this entry?')) return; award(function () { day()[list].splice(i, 1); }); R[stack[stack.length - 1]](); }
+
+// ---------- Workout ----------
+R.workout = function () {
+  var d = draft.workout || { title: '', min: '', kcal: '', muscles: [], exercises: [], note: '' }, ws = day().workouts || [];
+  v('workout', hdr('WORKOUT') + '<div class="panel"><h3>What did you do?</h3>' +
+    '<textarea id="wtext" placeholder="Bench 3x10 @40kg, incline DB 3x12, 20 min run" oninput="draft.wText=this.value">' + esc(draft.wText || '') + '</textarea>' +
+    '<button class="pri" onclick="sendAI(\'workout\')">Ask ChatGPT ' + ico('send', 16) + '</button><button onclick="fetchAI(\'workout\')">' + ico('clip', 18) + 'Paste answer</button>' + autoLine() + '</div>' +
+    '<div class="panel"><h3>Result</h3><label>Title<input id="wt" value="' + esc(d.title) + '"></label>' +
+    '<div class="g2"><label>Minutes<input id="wm" inputmode="decimal" value="' + d.min + '"></label><label>kcal burned<input id="wk" inputmode="decimal" value="' + d.kcal + '"></label></div>' +
+    '<label>Muscles, comma separated<input id="wmu" value="' + esc(d.muscles.join(', ')) + '"></label>' +
+    d.exercises.map(function (e) { return '<div class="item muted"><span>' + esc(e.name) + '</span><span>' + e.sets + '×' + esc(e.reps) + ' ' + esc(e.weight) + '</span></div>'; }).join('') +
+    aiResult(d) + '<button class="pri" onclick="saveWorkout()">' + ico('check', 16) + 'Save workout</button></div>' +
+    '<div class="panel"><h3>' + (cur === today ? 'Today' : cur) + '</h3>' + (ws.length ? ws.map(function (w, i) { return '<div class="item"><span>' + esc(w.title) + '<br><span class="muted">' + L.n(w.min) + ' min · ' + L.n(w.kcal) + ' kcal · ' + esc((w.muscles || []).join(', ')) + '</span></span><button class="ghost x" onclick="del(\'workouts\',' + i + ')" aria-label="Delete">' + ico('x', 18) + '</button></div>'; }).join('') : '<div class="muted">No workouts yet</div>') + '</div>');
+};
+function saveWorkout() {
+  var w = { t: hm(new Date()), title: val('wt') || 'Workout', min: num('wm'), kcal: num('wk'), muscles: val('wmu').split(',').map(function (s) { return s.trim(); }).filter(Boolean), exercises: (draft.workout || {}).exercises || [] };
+  if (!w.min && !w.kcal) return toast('Enter minutes or kcal');
+  award(function () { (day().workouts = day().workouts || []).push(w); });
+  draft.workout = null; draft.wText = ''; dropTmp(); R.workout();
+}
+
+// ---------- Sleep ----------
+var REFRESH = ['Wrecked', 'Tired', 'OK', 'Good', 'Fresh'];
+R.sleep = function () {
+  var s = day().sleep || { bed: '23:00', wake: '07:00', awake: 0, quality: 3, refreshed: 3 };
+  v('sleep', hdr('SLEEP') + '<div class="panel"><div class="g2"><label>Bed<input type="time" id="sb" value="' + esc(s.bed) + '" oninput="$(\'sh\').textContent=L.sleepHours(this.value,$(\'sw\').value)+\'h\'"></label>' +
+    '<label>Wake<input type="time" id="sw" value="' + esc(s.wake) + '" oninput="$(\'sh\').textContent=L.sleepHours($(\'sb\').value,this.value)+\'h\'"></label></div>' +
+    '<div class="ctr"><span class="muted">Total</span> <span class="big" id="sh">' + L.sleepHours(s.bed, s.wake) + 'h</span></div>' +
+    '<label>Times woke up<input type="number" id="sa" min="0" value="' + L.n(s.awake) + '"></label>' +
+    '<label>Quality</label><div class="stars" id="sq">' + [1, 2, 3, 4, 5].map(function (i) { return '<span data-i="' + i + '" class="' + (i <= s.quality ? 'on' : '') + '" onclick="pick(\'sq\',' + i + ')">' + ico('star') + '</span>'; }).join('') + '</div>' +
+    '<label>Woke up feeling</label><div class="pick" id="sr">' + REFRESH.map(function (r, i) { return '<button data-i="' + (i + 1) + '" class="' + (i + 1 === s.refreshed ? 'on' : '') + '" onclick="pick(\'sr\',' + (i + 1) + ')">' + r + '</button>'; }).join('') + '</div>' +
+    '<button class="pri" onclick="saveSleep()">' + ico('check', 16) + 'Save sleep</button><div class="muted">Saved on the day you woke up.</div></div>');
+  $('sq').dataset.v = s.quality; $('sr').dataset.v = s.refreshed;
+};
+function pick(id, i) { var e = $(id); e.dataset.v = i; e.querySelectorAll('[data-i]').forEach(function (s) { s.classList.toggle('on', id === 'sq' ? +s.dataset.i <= i : +s.dataset.i === i); }); buzz(8); }
+function saveSleep() {
+  var s = { bed: val('sb'), wake: val('sw'), awake: num('sa'), quality: +$('sq').dataset.v, refreshed: +$('sr').dataset.v };
+  s.hours = L.sleepHours(s.bed, s.wake); if (!s.hours) return toast('Set bed and wake time');
+  award(function () { day().sleep = s; }); goBack();
+}
+
+// ---------- Steps ----------
+R.steps = function () {
+  var s = day().steps || {}, si = cur === today ? stepInfo : null;
+  var note = !A.hasStepSensor() ? 'This phone has no step sensor. Use the override.' : !A.hasStepsPerm() ? 'Step permission is off. Me → Replay setup.' : !si ? 'Waiting for the first sensor reading.' :
+    si.partial ? 'Counting since ' + hm(new Date(si.since)) + ' (phone was off or asleep at midnight). Earlier steps unknown.' : 'Counting since midnight, even with the app closed.';
+  v('steps', hdr('STEPS') + '<div class="panel ctr"><h3>Phone sensor</h3><div class="big">' + (s.phone == null ? '—' : fmt(s.phone)) + '</div>' + bar(pct(L.n(s.phone), G().steps)) +
+    '<div class="muted">' + (cur === today ? note : 'Saved count for ' + cur) + '</div></div>' +
+    '<div class="panel"><h3>Override</h3><div class="muted">Replaces the phone count, e.g. from a watch or a walk without your phone.</div>' +
+    '<input id="sm" type="number" inputmode="numeric" placeholder="9500" value="' + (s.manual != null ? esc(s.manual) : '') + '">' +
+    '<button class="pri" onclick="saveSteps(1)">' + ico('check', 16) + 'Save override</button>' + (s.manual != null && s.manual !== '' ? '<button onclick="saveSteps(0)">Use phone count</button>' : '') + '</div>');
+};
+function saveSteps(set) { award(function () { var s = day().steps = day().steps || {}; if (set && val('sm') !== '') s.manual = num('sm'); else delete s.manual; }); R.steps(); }
+
+// ---------- Habits + screen ----------
+var habTab = 'h';
+R.habits = function () {
+  var h = day().habits || {}, sc = day().screen;
+  var tabs = '<div class="row"><button class="' + (habTab === 'h' ? 'on' : '') + '" onclick="habTab=\'h\';R.habits()">Habits</button><button class="' + (habTab === 's' ? 'on' : '') + '" onclick="habTab=\'s\';refreshSensors();R.habits()">Phone</button></div>';
+  if (habTab === 's') return v('habits', hdr('HABITS') + tabs + '<div class="panel">' + (A.hasUsage() ? (sc && cur === today ? '<div class="g2 ctr"><div><h3>Screen</h3><div class="big">' + Math.floor(sc.min / 60) + 'h' + sc.min % 60 + 'm</div></div><div><h3>' + (sc.pickKind === 'screen-ons' ? 'Screen-ons' : 'Unlocks') + '</h3><div class="big">' + (sc.pickups < 0 ? '—' : sc.pickups) + '</div></div></div>' +
+    bar(pct(sc.min, G().screen), sc.min > G().screen ? 'bad' : '') + '<div class="muted">Limit ' + G().screen + ' min. ' + (sc.pickKind === 'screen-ons' ? 'No lock screen found, so this counts screen-ons.' : 'Unlocks show how often you reach for it.') + ' Time in this app is not counted.</div><h3 style="margin-top:14px">Top apps</h3>' +
+    sc.apps.map(function (a) { return '<div class="item"><span>' + esc(a.app) + '</span><span class="px">' + a.min + 'm</span></div>'; }).join('') : '<div class="muted">Only today is shown live.</div>')
+    : '<div class="muted">Needs usage access. Android opens a list: find ALIVE?, turn it on, come back.</div><button class="pri" onclick="A.openUsageSettings()">Open usage access</button>') + '</div>');
+  v('habits', hdr('HABITS') + tabs + '<div class="panel"><div class="item"><span class="row" style="align-items:center;gap:8px;flex:none">' + ico('habits') + 'Cigarettes</span><span class="row" style="flex:none;align-items:center"><button class="sm" onclick="smk(-1)">−</button><b id="smk" class="px" style="padding:0 14px;font-size:20px">' + L.n(h.smoke) + '</b><button class="sm" onclick="smk(1)">+</button></span></div><div class="muted" id="smkl" style="padding:6px 0 4px">' + smkLine(L.n(h.smoke)) + '</div><img id="smki" class="jpic" src="' + jImg('smoke') + '" alt="" style="max-height:150px;margin-top:6px' + (L.n(h.smoke) ? '' : ';display:none') + '">' +
+    habitKeys().filter(function (k) { return k !== 'smoke'; }).map(function (k) { return '<label class="item" style="font-size:15px;text-transform:none;letter-spacing:0;color:var(--tx)"><span>' + L.BAD[k].label + '</span><input type="checkbox" id="hb_' + k + '"' + (h[k] ? ' checked' : '') + '></label>'; }).join('') +
+    '<label style="margin-top:12px">What set it off? How did you feel after?</label><textarea id="hn">' + esc(h.note || '') + '</textarea>' +
+    '<button class="pri" onclick="saveHabits()">' + ico('check', 16) + 'Save habits</button><div class="muted">Nothing ticked = clean day, +8 XP.</div></div>');
+};
+function smk(d) { var c = Math.max(0, L.n($('smk').textContent) + d); $('smk').textContent = c; $('smkl').textContent = smkLine(c); $('smki').style.display = c ? '' : 'none'; buzz(8); }
+// 11 min of life per cigarette (Shaw, Mitchell & Dorling, BMJ 2000;320:53). Total excludes today, which is shown live.
+function smkLine(c) { var past = L.cigTotal(D) - L.n((day().habits || {}).smoke) + c; return (c ? c + ' today = ' + L.fmtMin(L.lifeLost(c)) + ' of life. ' : 'None today: 0 min lost. ') + 'All logged: ' + past + ' = ' + L.fmtMin(L.lifeLost(past)) + '.'; }
+function saveHabits() {
+  award(function () { var h = { smoke: L.n($('smk').textContent), note: val('hn') }; habitKeys().forEach(function (k) { if (k !== 'smoke') h[k] = $('hb_' + k).checked; }); day().habits = h; day().habitsSaved = true; });
+  goBack();
+}
+
+// ---------- Mental ----------
+var FEEL = ['Focused', 'Calm', 'Motivated', 'Bored', 'Anxious', 'Restless', 'Low', 'Overstimulated'];
+var STATE = [['Flow', 'deep in it'], ['Distracted', 'jumping between things'], ['Bored', 'looking for stimulation'], ['Recovering', 'resting'], ['Overwhelmed', 'too much at once']];
+var mDraft = null;
+R.mental = function () {
+  var g = G(), d = day(); mDraft = mDraft || { feel: [], state: 'Flow', energy: 3, stress: 3 };
+  var dp = L.dopamine(d, g), ms = L.mentalScore(d, g);
+  v('mental', hdr('MIND') + '<div class="row" style="align-items:center;gap:14px;margin-bottom:14px">' + face(ms == null ? 'neutral' : ms < 40 ? 'worried' : ms < 65 ? 'neutral' : 'smile', 64) +
+      '<div style="flex:1"><h3 style="margin:0">Mind score</h3><div class="big">' + (ms == null ? '—' : ms + '%') + '</div>' + (ms == null ? '<div class="muted">Save a check-in to get one.</div>' : '') + '</div></div>' +
+    '<div class="note"><h3>Sticky note</h3><div>Finished the to-do you wrote by hand?</div><button class="' + (d.workDone ? 'on' : 'pri') + '" onclick="toggleWork()">' + (d.workDone ? ico('check', 16) + 'Done · +8 claimed' : 'Yes, done · +8 XP') + '</button></div>' +
+    '<div class="panel"><h3>Right now I feel</h3>' + FEEL.map(function (f) { return '<button class="tag ' + (mDraft.feel.indexOf(f) >= 0 ? 'on' : '') + '" onclick="mf(\'' + f + '\')">' + f + '</button>'; }).join('') +
+    '<label style="margin-top:12px">Energy <b id="me_v" class="px">' + mDraft.energy + '</b>/5<input type="range" min="1" max="5" value="' + mDraft.energy + '" oninput="mDraft.energy=+this.value;$(\'me_v\').textContent=this.value"></label>' +
+    '<label>Stress <b id="ms_v" class="px">' + mDraft.stress + '</b>/5<input type="range" min="1" max="5" value="' + mDraft.stress + '" oninput="mDraft.stress=+this.value;$(\'ms_v\').textContent=this.value"></label>' +
+    '<h3 style="margin-top:6px">State</h3>' + STATE.map(function (s) { return '<button class="' + (mDraft.state === s[0] ? 'on' : '') + '" style="justify-content:flex-start;margin:4px 0 8px" onclick="mDraft.state=\'' + s[0] + '\';R.mental()">' + ico(mDraft.state === s[0] ? 'check' : 'dot', 14) + s[0] + ' <span class="muted" style="text-transform:none;font-family:system-ui">' + s[1] + '</span></button>'; }).join('') +
+    '<button class="pri" onclick="saveMental()">' + ico('check', 16) + 'Save check-in</button></div>' +
+    '<div class="panel"><h3>Dopamine today</h3><div class="row sp"><span>Earned</span><b class="px ok">' + dp.earned + '</b></div>' + bar(dp.earned) + '<div class="row sp"><span>Cheap</span><b class="px neg">' + dp.cheap + '</b></div>' + bar(dp.cheap, 'bad') +
+      '<div class="muted">Earned: work done, training, steps, flow, urges resisted. Cheap: phone time, unlocks, bad habits.</div></div>' +
+    ((d.mental || []).length ? '<div class="panel"><h3>Check-ins</h3>' + d.mental.map(function (m) { return '<div class="item"><span>' + esc(m.t) + ' · ' + esc(m.state) + '</span><span class="muted">' + esc((m.feel || []).join(', ')) + ' · E' + L.n(m.energy) + ' S' + L.n(m.stress) + '</span></div>'; }).join('') + '</div>' : ''));
+};
+function mf(f) { var i = mDraft.feel.indexOf(f); if (i >= 0) mDraft.feel.splice(i, 1); else mDraft.feel.push(f); R.mental(); }
+function saveMental() { var m = mDraft; m.t = hm(new Date()); award(function () { (day().mental = day().mental || []).push(m); }); mDraft = null; R.mental(); }
+
+// ---------- Urge surfing ----------
+var urgeT;
+function urge() {
+  var left = 90, cyc = ['Breathe in · 4', 'Hold · 4', 'Breathe out · 6'];
+  modal('<div style="display:flex;justify-content:center">' + face('neutral', 72) + '</div><h2 style="margin-top:12px">Wait it out</h2><div class="muted">An urge peaks and fades in about 90 seconds. Watch it, don\'t act on it.</div><div class="ring" id="ut">90</div><div class="px" id="uc">' + cyc[0] + '</div>' +
+    '<button class="pri" onclick="urgeDone(1)">It passed · +3</button><button onclick="urgeDone(0)">I gave in</button>');
+  urgeT = setInterval(function () { left--; if ($('ut')) { $('ut').textContent = left > 0 ? left : '0'; $('uc').textContent = left > 0 ? cyc[Math.floor((90 - left) / 5) % 3] : 'It passed.'; if (left % 5 === 0 && left > 0) buzz(15); } if (left <= 0) { clearInterval(urgeT); buzz([30, 50, 30]); } }, 1000);
+}
+function urgeDone(ok) { closeModal(); if (ok) award(function () { day(today).urges = L.n(day(today).urges) + 1; }); else { toast('Log it in Habits.'); go('habits'); } if (stack[stack.length - 1] === 'home') R.home(); }
+
+// ---------- Stats ----------
+var statN = 7;
+R.stats = function () {
+  var g = G(), a = lastN(statN), b = lastN(statN, L.addDays(today, -statN));
+  function avg(arr, f) { var xs = arr.filter(function (d) { return D.days[d.date]; }).map(f).filter(function (x) { return x > 0; }); return xs.length ? xs.reduce(function (s, x) { return s + x; }, 0) / xs.length : null; }
+  var rows = [['sleep', 'Sleep avg', function (d) { return (d.sleep || {}).hours || 0; }, 'h', 1, 1], ['steps', 'Steps avg', L.steps, '', 0, 1], ['fire', 'Calories avg', function (d) { return L.totals(d).kcal; }, '', 0, 0],
+    ['meal', 'Protein avg', function (d) { return L.totals(d).p; }, 'g', 0, 1], ['phone', 'Screen avg', function (d) { return (d.screen || {}).min || 0; }, 'm', 0, -1], ['phone', 'Unlocks avg', function (d) { return Math.max((d.screen || {}).pickups || 0, 0); }, '', 0, -1],
+    ['habits', 'Cigarettes', function (d) { return L.n((d.habits || {}).smoke); }, '', 0, -1, 1], ['workout', 'Workouts', function (d) { return (d.workouts || []).length; }, '', 0, 1, 1]];
+  var xs = a.map(function (d) { return L.dayXP(d, g).xp; }), mx = Math.max.apply(null, xs.map(Math.abs).concat([50]));
+  var cons = Math.round(xs.filter(function (x) { return x >= 60; }).length / statN * 100);
+  v('stats', '<h1>STATS</h1><div class="row" style="margin:12px 0 4px"><button class="' + (statN === 7 ? 'on' : '') + '" onclick="statN=7;R.stats()">Week</button><button class="' + (statN === 30 ? 'on' : '') + '" onclick="statN=30;R.stats()">Month</button></div>' +
+    '<div class="panel"><div class="row sp"><h3 style="margin:0">XP per day</h3><span class="px">Consistency <b class="ok">' + cons + '%</b></span></div><div class="bars">' + a.map(function (d, i) { return '<div><i class="' + (xs[i] < 0 ? 'neg' : '') + '" style="height:' + Math.max(2, Math.abs(xs[i]) / mx * 96) + 'px"></i>' + (statN === 7 ? 'SMTWTFS'[new Date(d.date + 'T12:00').getDay()] : '') + '</div>'; }).join('') + '</div><div class="muted">Consistency = days with 60+ XP (max ' + L.DAY_MAX + ').</div></div>' +
+    '<div class="panel">' + rows.map(function (r) {
+      var sum = r[6], f = function (arr) { return sum ? (arr.some(logged) ? arr.reduce(function (s, d) { return s + r[2](d); }, 0) : null) : avg(arr, r[2]); }, x = f(a), y = f(b), dlt = x != null && y ? Math.round((x - y) / y * 100) : 0, good = dlt * r[5] > 0;
+      return '<div class="item"><span class="row" style="gap:10px;align-items:center;flex:none">' + ico(r[0]) + r[1] + '</span><span class="px">' + (x == null ? '—' : (r[4] ? x.toFixed(r[4]) : fmt(x)) + r[3]) + (dlt ? ' <span class="' + (good ? 'ok' : 'neg') + '">' + (dlt > 0 ? '▲' : '▼') + Math.abs(dlt) + '%</span>' : '') + '</span></div>';
+    }).join('') + '<div class="muted" style="margin-top:6px">Arrows compare with the ' + statN + ' days before.</div></div>');
+};
+
+// ---------- Me / avatar ----------
+var ACH = [
+  ['workout', 'First rep', function (ds) { return ds.some(function (d) { return (d.workouts || []).length; }); }],
+  ['steps', '10K day', function (ds) { return ds.some(function (d) { return L.steps(d) >= 10000; }); }],
+  ['sleep', '7 good nights', function (ds) { return ds.filter(function (d) { return (d.sleep || {}).hours >= 7; }).length >= 7; }],
+  ['mental', 'Flow x5', function (ds) { return ds.reduce(function (s, d) { return s + (d.mental || []).filter(function (m) { return m.state === 'Flow'; }).length; }, 0) >= 5; }],
+  ['note', '10 notes done', function (ds) { return ds.filter(function (d) { return d.workDone; }).length >= 10; }],
+  ['meal', 'Protein x7', function (ds) { return ds.filter(function (d) { return L.totals(d).p >= G().protein; }).length >= 7; }],
+  ['heart', 'Smoke-free 7', function () { return L.cleanStreak(D, 'smoke', today) >= 7; }],
+  ['shield', 'Smoke-free 30', function () { return L.cleanStreak(D, 'smoke', today) >= 30; }],
+  ['phone', 'Phone limit x5', function (ds) { return ds.filter(function (d) { return d.screen && d.screen.min <= G().screen; }).length >= 5; }],
+  ['bolt', '20 urges beaten', function (ds) { return ds.reduce(function (s, d) { return s + L.n(d.urges); }, 0) >= 20; }],
+  ['star', 'Level 5', function () { return L.level(totalXP()).lv >= 5; }],
+  ['crown', 'Level 10', function () { return L.level(totalXP()).lv >= 10; }]];
+R.me = function () {
+  var g = G(), p = D.profile, tx = totalXP(), lv = L.level(tx), w = lastN(7), ds = Object.keys(D.days).map(function (k) { return D.days[k]; });
+  var stats = [['workout', 'Strength', Math.min(w.reduce(function (s, d) { return s + (d.workouts || []).length; }, 0) * 20, 100)],
+    ['steps', 'Endurance', (function () { var x = w.filter(L.hasSteps); return x.length ? pct(x.reduce(function (s, d) { return s + L.steps(d); }, 0) / x.length, g.steps) : null; })()],
+    ['heart', 'Recovery', L.recovery(peek(today), peek(L.addDays(today, -1)), g)], ['mental', 'Focus', L.mentalScore(peek(today), g)],
+    ['star', 'Consistency', Math.round(w.filter(function (d) { return L.dayXP(d, g).xp >= 60; }).length / 7 * 100)]];
+  var got = ACH.filter(function (a) { return a[2](ds); }).length;
+  v('me', '<h1>ME</h1><div class="hero" style="align-items:center">' + body(2) + '<div class="info"><div class="muted px">' + esc(p.name === 'Hero' ? 'Player 1' : p.name) + '</div><div style="margin:4px 0"><span class="lv">LV ' + lv.lv + '</span> <span class="px" style="font-size:17px">' + lv.title + '</span></div>' +
+      bar(pct(tx - lv.from, lv.to - lv.from), 'gold') + '<div class="muted px">' + fmt(tx - lv.from) + ' / ' + fmt(lv.to - lv.from) + ' XP · lifetime ' + fmt(tx) + '</div>' +
+      stats.map(function (s) { return '<div class="row sp" style="margin-top:8px;font-size:13px"><span class="row" style="gap:6px;align-items:center">' + ico(s[0], 14) + s[1] + '</span><b class="px">' + (s[1 + 1] == null ? '—' : s[2]) + '</b></div>' + bar(s[2] || 0); }).join('') + '</div></div>' +
+    '<div class="panel"><div class="row sp"><h3 style="margin:0">Badges</h3><span class="muted px">' + got + ' / ' + ACH.length + '</span></div><div class="ach" style="margin-top:10px">' + ACH.map(function (a) { return '<div class="' + (a[2](ds) ? '' : 'lock') + '">' + ico(a[0]) + '<span>' + a[1] + '</span></div>'; }).join('') + '</div></div>' +
+    '<div class="panel"><h3>Profile & targets</h3><div class="g3"><label>Name<input id="pn" value="' + esc(p.name) + '"></label><label>Age<input id="pa" inputmode="numeric" value="' + esc(p.age) + '"></label><label>Weight kg<input id="pw" inputmode="decimal" value="' + esc(p.weight) + '"></label></div>' +
+    '<div class="g3">' + [['kcal', 'Calories'], ['protein', 'Protein g'], ['carbs', 'Carbs g'], ['fat', 'Fat g'], ['steps', 'Steps'], ['sleep', 'Sleep h'], ['screen', 'Phone min']].map(function (k) { return '<label>' + k[1] + '<input id="g_' + k[0] + '" inputmode="decimal" value="' + g[k[0]] + '"></label>'; }).join('') + '</div>' +
+    '<button class="pri" onclick="saveProfile()">' + ico('check', 16) + 'Save</button></div>' +
+    '<div class="panel"><h3>Modules</h3>' + modBoxes() + '<button onclick="modSave()">Save modules</button></div>' +
+    '<div class="panel"><h3>Avatar</h3><div class="muted">Turn a selfie into your pixel avatar and every picture in the app.</div><button onclick="go(\'studio\')">Avatar studio</button></div>' +
+    '<div class="panel"><h3>My cockpit</h3><button onclick="notionCfg()">' + ico('notion', 16) + 'Configure Notion workspace</button></div>' +
+    '<div class="panel"><h3>Backup</h3>' + bkPanel() + '<div class="muted" style="margin-top:8px">Manual: export a file to Drive, email or Files, or restore one (old exports and auto backups both work).</div>' +
+    '<button onclick="A.exportBackup(JSON.stringify(D))">Export backup file</button><button onclick="A.pickBackup()">Restore from file</button><textarea id="imp" placeholder="Or paste backup text here"></textarea><button onclick="importText(val(\'imp\'))">Restore from text</button>' +
+    '<button onclick="ob(0)">Replay setup</button><div class="muted">Using ' + (JSON.stringify(D).length / 1024).toFixed(1) + ' KB</div></div>');
+};
+function saveProfile() {
+  var p = D.profile; p.name = val('pn') || 'Hero'; p.age = val('pa'); p.weight = val('pw');
+  Object.keys(p.goals).forEach(function (k) { var x = num('g_' + k); if (x > 0 && x !== p.goals[k]) { p.goals[k] = x; p.goalsEdited = true; } });
+  save(); toast('Saved'); R.me();
+}
+// Takes a plain backup (manual export) or an auto backup envelope {meta, data}; the current data is backed up first.
+function importText(txt) {
+  var raw, o; try { raw = JSON.parse(txt); if (!(raw && raw.meta && raw.data)) raw = { data: raw }; o = L.sanitize(raw.data); } catch (e) { return toast('Not an ALIVE? backup'); }
+  if (!confirm('Replace ALL current data with this backup (' + Object.keys(o.days).length + ' days)?')) return;
+  autoBackup('before restore', true);
+  D = o; D.onboarded = true; if (!D.xp) L.migrateXP(D, today); save(); $('ob').style.display = 'none'; navDraw(); avLoad();
+  var nu = raw.meta && raw.meta.prefs && raw.meta.prefs.notionUrl; if (nu && A.setNotionUrl) A.setNotionUrl(nu);
+  toast('Restored'); go('home', 1);
+}
+// ---------- auto backup: one gzip file per backup in a folder you pick (AutoBackup.java writes, checks and prunes:
+// 7 daily, 4 weekly, 6 monthly, 10 MB max). Everything in D goes in: fitness, XP, GATE, placement tower, lab, reset backups.
+function bkOn() { return !!A.backupNow; }
+function bkState() { try { return JSON.parse(A.backupState()) || {}; } catch (e) { return {}; } }
+function bkMeta(why) {
+  var g = D.gate || {}, m = g.mocks || {};
+  return JSON.stringify({ app: 'ALIVE?', v: 1, at: new Date().toISOString(), why: why, days: Object.keys(D.days || {}).length, mocks: (m.da || []).length + (m.cs || []).length,
+    tests: Object.keys(g.tests || {}).length, projects: ((D.lab || {}).p || []).length, accTasks: Object.keys((D.acc || {}).done || {}).length });
+}
+// Writes only when the data changed since the last file (Java compares checksums); force always writes (before risky actions).
+function autoBackup(why, force) {
+  if (!bkOn()) return 'off';
+  var e = A.backupNow(bkMeta(why), JSON.stringify(D), !!force);
+  if (e && e !== 'off' && force) toast('Backup failed: ' + e);
+  return e;
+}
+function onAppPause() { if (D.onboarded) autoBackup('closed'); }
+function onBackupFolder() { if (!D.onboarded) return bkList(); var e = autoBackup('first', true); toast(e ? 'Folder set, but the backup failed: ' + e : 'Backup folder set · first backup saved'); if (stack[stack.length - 1] === 'me') R.me(); }
+function bkAgo(ms) { if (!ms) return 'never'; var m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago'; }
+function bkPanel() {
+  if (!bkOn()) return '';
+  var st = bkState();
+  if (!st.tree) return '<div class="neg px">AUTO BACKUP: OFF</div><div class="muted">Pick a folder once, e.g. Documents/ALIVE Backups. Files there survive uninstalling the app.</div><button class="pri" onclick="A.backupPickFolder()">Choose backup folder</button>';
+  return '<div class="row sp"><b class="px ok">AUTO BACKUP: ON</b><span class="muted px">' + st.files + ' files · ' + (st.bytes / 1048576).toFixed(2) + ' MB</span></div>' +
+    '<div class="muted">Folder: ' + esc(st.folder) + ' · last file ' + bkAgo(st.last) + '</div>' + (st.err ? '<div class="neg">Last try failed: ' + esc(st.err) + '</div>' : '') +
+    '<div class="row"><button onclick="bkNow()">Back up now</button><button onclick="bkList()">Restore…</button></div><button onclick="A.backupPickFolder()">Change folder</button>' +
+    '<div class="muted" style="font-size:12px">Saves when you leave or open the app if anything changed, and before restores and resets. Keeps 7 daily, 4 weekly and 6 monthly files, 10 MB max. Files are not encrypted: apps with file access on this phone can read them.</div>';
+}
+function bkNow() { if (!autoBackup('manual', true)) toast('Backup saved'); R.me(); }
+function bkList() {
+  var a = []; try { a = JSON.parse(A.backupList()); } catch (e) {}
+  modal('<h2>Restore a backup</h2><div class="muted" style="margin:6px 0">Newest first. Your current data is backed up before anything is replaced.</div><div style="text-align:left;max-height:50vh;overflow:auto">' +
+    (a.length ? a.map(function (f) { var m = f.meta || {}, d = f.name.slice(6, 16) + ' ' + f.name.slice(17, 19) + ':' + f.name.slice(19, 21);
+      return '<div class="item" onclick="bkRestore(\'' + esc(f.name) + '\')"><span>' + d + '<br><span class="muted">' + (f.meta ? m.days + ' days · ' + m.mocks + ' mocks · ' + m.projects + ' projects · ' + esc(m.why || '') : 'unreadable') + '</span></span><b class="px">' + Math.max(1, Math.round(f.size / 1024)) + ' KB</b></div>'; }).join('') : '<div class="muted">No backups in the folder yet.</div>') +
+    '</div><button onclick="closeModal()">Close</button>');
+}
+function bkRestore(name) { var r = {}; try { r = JSON.parse(A.backupRead(name)); } catch (e) {} closeModal(); if (r.err || !r.text) return toast(r.err || 'Can\'t read that backup'); importText(r.text); }
+// Home: a red line when backups stop working, or were never turned on after a few days of use
+function bkWarn() {
+  if (!bkOn()) return ''; var st = bkState();
+  if (!st.tree) return Object.keys(D.days).length >= 3 ? '<div class="panel" onclick="go(\'me\')"><b class="neg">Auto backup is off.</b> <span class="muted">Tap to pick a backup folder.</span></div>' : '';
+  var age = st.ok ? (Date.now() - st.ok) / 86400000 : 99;
+  return st.err || age > 3 ? '<div class="panel" onclick="go(\'me\')"><b class="neg">' + (st.err ? 'Backup failing: ' + esc(st.err) : 'No backup for ' + Math.floor(age) + ' days') + '</b> <span class="muted">Tap to check.</span></div>' : '';
+}
+// ---------- update check (public edition): once a day, compare with the latest GitHub release. Nothing about you is sent.
+var UPD = null;
+function vNewer(tag, cur) { var a = String(tag).replace(/^v/, '').split('.').map(Number), b = String(cur).split('.').map(Number); for (var i = 0; i < 3; i++) if ((a[i] || 0) !== (b[i] || 0)) return (a[i] || 0) > (b[i] || 0); return false; }
+function updCheck() {
+  if (!window.EDITION || EDITION.name !== 'public' || !A.appVersion || !window.fetch) return;
+  var c = {}; try { c = JSON.parse(localStorage.getItem('alive_upd') || '{}') || {}; } catch (e) {}
+  var show = function () { UPD = c.tag && /^https:\/\/github\.com\//.test(c.url || '') && vNewer(c.tag, A.appVersion()) ? c : null; if (UPD && stack[stack.length - 1] === 'home') R.home(); };
+  if (c.day === today) return show();
+  fetch('https://api.github.com/repos/faizdevx/alive-app/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    c = { day: today, tag: j && j.tag_name || '', url: j && j.html_url || '' }; try { localStorage.setItem('alive_upd', JSON.stringify(c)); } catch (e) {} show();
+  }).catch(function () {});
+}
+function updWarn() { return UPD ? '<div class="panel" onclick="A.openLink(UPD.url)"><b class="ok">Update available: ' + esc(UPD.tag) + '</b> <span class="muted">Tap to download it from GitHub.</span></div>' : ''; }
+setTimeout(updCheck, 4000);
+setTimeout(function () { if (D.onboarded) { autoBackup('opened'); if (stack[stack.length - 1] === 'home') R.home(); } }, 2500);
+
+
+// ---------- Opening screen + first-run setup ----------
+function hideSplash() { var s = $('splash'); if (!s || s.classList.contains('out')) return; s.classList.add('out'); setTimeout(function () { s.remove(); }, 400); }
+var obStep = 0;
+function ob(i) {
+  obStep = i; var p = D.profile, e = $('ob'); e.style.display = 'block'; e.scrollTop = 0;
+  var dots = '<div class="dots">' + [0, 1, 2, 3, 4].map(function (k) { return '<i class="' + (k <= i ? 'on' : '') + '"></i>'; }).join('') + '</div>';
+  var next = function (label) { return '<button class="pri" onclick="obNext()">' + (label || 'Next') + ' ' + ico('next', 14) + '</button>' + (i ? '<button onclick="obSave();ob(' + (i - 1) + ')">Back</button>' : ''); };
+  var st = function (ok, yes, no) { return '<div class="' + (ok ? 'ok' : 'warn') + '">' + (ok ? yes : no) + '</div>'; };
+  var nm = p.name === 'Hero' ? '' : p.name, h;
+  if (i === 0) h = '<div style="display:flex;justify-content:center;margin-top:16px">' + body(2) + '</div><div class="say" style="margin-top:18px">' + (nm ? 'Hey ' + esc(nm) + '.' : 'Hey.') + ' This is you. You level up by doing the boring stuff: eating right, training, sleeping, staying off the phone.</div>' +
+    '<div class="panel"><ol><li>Log meals, workouts, sleep, steps, habits and your mind.</li><li>Good days earn <b class="ok">XP</b>. Slips (scrolling, smoking, porn) never take XP away, they break your <b class="neg">clean streaks</b>.</li><li>ChatGPT does the calorie maths. No API, no account linking.</li><li>Everything stays on this phone. Text only, photos are never kept.</li></ol></div>' + '<div class="panel"><h3>Coming back?</h3><div class="muted">Restore everything from a backup instead of starting fresh.</div><div class="row"><button onclick="A.backupPickFolder()">Backup folder</button><button onclick="A.pickBackup()">Backup file</button></div></div>' + next('Start');
+  if (i === 1) h = '<h1>ABOUT YOU</h1><div class="muted" style="margin:6px 0 12px">Used for your targets and health age. Stays on the phone.</div><div class="panel">' +
+    '<label>Name<input id="o_name" value="' + esc(nm) + '" placeholder="Your name"></label>' +
+    '<div class="g2"><label>Age<input id="o_age" inputmode="numeric" value="' + esc(p.age) + '"></label><label>Sex (for calories)<select id="o_sex"><option value="m"' + (p.sex !== 'f' ? ' selected' : '') + '>Male</option><option value="f"' + (p.sex === 'f' ? ' selected' : '') + '>Female</option></select></label>' +
+    '<label>Height cm<input id="o_h" inputmode="decimal" value="' + esc(p.height || '') + '"></label><label>Weight kg<input id="o_w" inputmode="decimal" value="' + esc(p.weight) + '"></label></div></div>' + next();
+  if (i === 2) {
+    var sug = obSuggest(), g = G();
+    h = '<h1>TARGETS</h1><div class="muted" style="margin:6px 0 12px">' + (sug ? 'Calories from Mifflin-St Jeor × 1.4 (light activity). Protein 1.6 g per kg. Fat 25% of calories. Change anything.' : 'Age, height or weight missing, so these are plain defaults. Change them.') + '</div><div class="panel g3">' +
+      [['kcal', 'Calories'], ['protein', 'Protein g'], ['carbs', 'Carbs g'], ['fat', 'Fat g'], ['steps', 'Steps'], ['sleep', 'Sleep h'], ['screen', 'Phone min']].map(function (k) { return '<label>' + k[1] + '<input id="o_' + k[0] + '" inputmode="decimal" value="' + g[k[0]] + '"></label>'; }).join('') + '</div>' + next();
+  }
+  if (i === 3) h = '<h1>PERMISSIONS</h1><div class="muted" style="margin:6px 0 12px">All optional. Without one, you type that data in yourself.</div>' +
+    '<div class="panel"><h3>' + ico('steps', 14) + ' Steps</h3>' + (A.hasStepSensor() ? (A.hasStepsPerm() ? st(1, 'Step tracking is on') : '<div class="muted">Lets the step sensor count your walking, even with the app closed.</div><button onclick="A.requestSteps()">Allow step tracking</button>') : st(0, '', 'This phone has no step sensor. Use manual steps.')) + '</div>' +
+    '<div class="panel"><h3>' + ico('phone', 14) + ' Phone time</h3>' + (A.hasUsage() ? st(1, 'Usage access is on') : '<div class="muted">Android opens a list: find ALIVE?, turn it on, come back.</div><button onclick="A.openUsageSettings()">Open usage access</button>') + '</div>' +
+    '<div class="panel"><h3>' + ico('send', 14) + ' ChatGPT app</h3>' + st(A.hasChatGPT(), 'ChatGPT is installed', 'ChatGPT isn\'t installed. Get it from the Play Store and log in, or pick another AI app when sharing.') + '</div>' +
+    '<div class="panel"><h3>' + ico('bolt', 14) + ' Auto mode</h3>' + (A.hasAutoGPT() ? st(1, 'On. ALIVE? types into ChatGPT, sends, and brings the answer back.') :
+      '<div class="muted">Lets ALIVE? type into the ChatGPT app, press Send and read the answer, so you never copy or paste. In the list tap <b>ALIVE? auto ChatGPT</b> and turn it on. If it is greyed out: Settings → Apps → ALIVE? → ⋮ → Allow restricted settings, then try again.</div><button onclick="A.openAutoGPTSettings()">Open accessibility settings</button>') + '</div>' + next();
+  if (i === 4) h = '<h1>HOW IT WORKS</h1><div class="panel" style="margin-top:12px"><h3>Logging food or training</h3><ol><li>Log → Meal or Workout. Take a photo and/or type it.</li><li>Tap <b>Ask ChatGPT</b>. It opens with everything filled in. Press send.</li><li>Tap <b>Copy</b> under the answer.</li><li>Come back. It fills in by itself. Check it, save.</li></ol></div>' +
+    '<div class="panel"><h3>A normal day</h3><ol><li>Morning: log sleep.</li><li>After eating: log the meal.</li><li>After training: log the workout.</li><li>Urge to scroll or smoke: tap Urge and wait it out (+3).</li><li>Night: save habits (clean day +8) and claim the sticky note (+8).</li></ol></div>' + '<div class="panel"><h3>Pick your modules</h3><div class="muted">Change them any time in Me.</div>' + modBoxes(1) + '</div><div class="muted" style="margin-bottom:10px">Make your own pixel avatar later in Me → Avatar studio.</div>' + next('Play');
+  e.innerHTML = dots + h;
+}
+// Fills calorie/macro goals from body data unless you've edited goals yourself. Returns false if data missing.
+function obSuggest() {
+  var p = D.profile, a = L.n(p.age), w = L.n(p.weight), ht = L.n(p.height);
+  if (!(a > 0 && w > 0 && ht > 0)) return false;
+  if (!p.goalsEdited) {
+    var g = G(), kcal = Math.round((10 * w + 6.25 * ht - 5 * a + (p.sex === 'f' ? -161 : 5)) * 1.4 / 50) * 50;
+    g.kcal = kcal; g.protein = Math.round(w * 1.6); g.fat = Math.round(kcal * 0.25 / 9); g.carbs = Math.max(0, Math.round((kcal - g.protein * 4 - g.fat * 9) / 4)); save();
+  }
+  return true;
+}
+function obSave() {
+  var p = D.profile, x = function (id) { return $(id) ? $(id).value.trim() : null; };
+  if (obStep === 1 && $('o_age')) { p.name = x('o_name') || 'Hero'; p.age = x('o_age'); p.sex = x('o_sex'); p.height = x('o_h'); p.weight = x('o_w'); }
+  if (obStep === 2 && $('o_kcal')) Object.keys(G()).forEach(function (k) { var v = L.n(x('o_' + k)); if (v > 0 && v !== G()[k]) { G()[k] = v; p.goalsEdited = true; } });
+  save();
+}
+function obNext() {
+  obSave();
+  if (obStep < 4) return ob(obStep + 1);
+  modRead(); D.onboarded = true; save(); navDraw(); $('ob').style.display = 'none'; go('home', 1); buzz([20, 40, 20]);
+}
+
+refreshSensors(); show();
+(function () { var lv = L.level(totalXP()); $('splash').innerHTML = '<img src="logo.png" alt="ALIVE?" style="width:220px;height:220px">' + '<div class="muted px" style="margin-top:14px">' + (D.onboarded ? 'LV ' + lv.lv + ' · ' + lv.title : 'New game') + '</div><div class="blink">TAP TO START</div>'; })();setTimeout(hideSplash, 1800);
+if (!D.onboarded) ob(0);
+else (function () {
+  var t; try { t = JSON.parse(localStorage.getItem(TMP)); } catch (e) {}
+  if (!t || Date.now() - t.at > 3 * 3600e3) return dropTmp();
+  draft = t.draft || {}; pend = t.pend; go(t.view);
+  if (pend && !A.hasAutoGPT()) setTimeout(function () { fetchAI(pend, true); }, 1200);
+})();
+// The page may have reloaded while ChatGPT was answering: pick up a result the auto driver left behind.
+setTimeout(function () { if ($('ob').style.display !== 'block') onAppResume(); }, 300);
+
+setInterval(function () { if (document.visibilityState === 'visible') { refreshSensors(); if (stack[stack.length - 1] === 'home') R.home(); } }, 30000);
+</script>
+<script src="journey.js"></script><script src="studio.js"></script>
+</body></html>

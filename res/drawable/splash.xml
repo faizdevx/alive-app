@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shown before the WebView paints: dark screen + the ALIVE? logo. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/bg" />
+    <item android:gravity="center" android:width="192dp" android:height="192dp">
+        <bitmap android:src="@drawable/splash_logo" android:filter="true" android:gravity="fill" />
+    </item>
+</layer-list>
